@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palette Options</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Space Grotesk', sans-serif; background: #F0EDEA; padding: 3rem 2rem; }
+    h1 { font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #888; margin-bottom: 2.5rem; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 2rem; }
+
+    .card { border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+    .card-label {
+      background: #fff; padding: 0.75rem 1.25rem;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #555;
+      border-bottom: 1px solid #E8E4E0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-label span { font-weight: 400; color: #AAA; }
+
+    .swatches { display: flex; height: 56px; }
+    .swatch { flex: 1; }
+
+    .preview { padding: 2rem; }
+    .preview-eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.6rem; }
+    .preview-heading { font-family: 'Instrument Serif', serif; font-size: 1.6rem; line-height: 1.2; margin-bottom: 0.75rem; }
+    .preview-body { font-size: 0.85rem; line-height: 1.65; margin-bottom: 1.25rem; opacity: 0.7; }
+    .preview-btn { display: inline-block; font-size: 0.8rem; font-weight: 700; padding: 0.55rem 1.2rem; border-radius: 6px; letter-spacing: 0.02em; }
+    .preview-tag { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 100px; margin-left: 0.5rem; vertical-align: middle; }
+
+    .dark-strip { padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
+    .dark-strip-text { font-family: 'Instrument Serif', serif; font-size: 1.1rem; font-style: italic; }
+    .dark-btn { font-size: 0.75rem; font-weight: 700; padding: 0.45rem 1rem; border-radius: 5px; letter-spacing: 0.02em; border: none; cursor: default; }
+  </style>
+</head>
+<body>
+  <h1>Palette options — Kristel Suntay</h1>
+  <div class="grid">
+
+    <!-- A: Warm Gold -->
+    <div class="card">
+      <div class="card-label">A — Warm Gold <span>premium, confident, luminous</span></div>
+      <div class="swatches">
+        <div class="swatch" style="background:#0E0D0B;"></div>
+        <div class="swatch" style="background:#F7F5F0;"></div>
+        <div class="swatch" style="background:#D4A025;"></div>
+        <div class="swatch" style="background:#7A7570;"></div>
+        <div class="swatch" style="background:#F0EBD8;"></div>
+      </div>
+      <div class="preview" style="background:#F7F5F0;">
+        <div class="preview-eyebrow" style="color:#D4A025;">Performance Consultant</div>
+        <div class="preview-heading" style="color:#0E0D0B;">I help teams fix the<br><em>real</em> problem.</div>
+        <div class="preview-body" style="color:#0E0D0B;">Most training fails because it treats a process problem like a knowledge problem.</div>
+        <a class="preview-btn" style="background:#0E0D0B; color:#D4A025;">View my work</a>
+        <span class="preview-tag" style="background:#F0EBD8; color:#7A7570;">AI-Assisted L&D</span>
+      </div>
+      <div class="dark-strip" style="background:#0E0D0B;">
+        <span class="dark-strip-text" style="color:#F7F5F0;">"Training is the last resort,<br>not the first response."</span>
+        <button class="dark-btn" style="background:#D4A025; color:#0E0D0B;">Hire me</button>
+      </div>
+    </div>
+
+    <!-- B: Electric Lime -->
+    <div class="card">
+      <div class="card-label">B — Electric Lime <span>bold, modern, distinctive</span></div>
+      <div class="swatches">
+        <div class="swatch" style="background:#0D0F0A;"></div>
+        <div class="swatch" style="background:#F6F7F2;"></div>
+        <div class="swatch" style="background:#B5CC2E;"></div>
+        <div class="swatch" style="background:#72786A;"></div>
+        <div class="swatch" style="background:#E8EDD4;"></div>
+      </div>
+      <div class="preview" style="background:#F6F7F2;">
+        <div class="preview-eyebrow" style="color:#7A8C1A;">Performance Consultant</div>
+        <div class="preview-heading" style="color:#0D0F0A;">I help teams fix the<br><em>real</em> problem.</div>
+        <div class="preview-body" style="color:#0D0F0A;">Most training fails because it treats a process problem like a knowledge problem.</div>
+        <a class="preview-btn" style="background:#0D0F0A; color:#B5CC2E;">View my work</a>
+        <span class="preview-tag" style="background:#E8EDD4; color:#72786A;">AI-Assisted L&D</span>
+      </div>
+      <div class="dark-strip" style="background:#0D0F0A;">
+        <span class="dark-strip-text" style="color:#F6F7F2;">"Training is the last resort,<br>not the first response."</span>
+        <button class="dark-btn" style="background:#B5CC2E; color:#0D0F0A;">Hire me</button>
+      </div>
+    </div>
+
+    <!-- C: Warm Copper -->
+    <div class="card">
+      <div class="card-label">C — Copper <span>warm, creative, grounded</span></div>
+      <div class="swatches">
+        <div class="swatch" style="background:#130E0A;"></div>
+        <div class="swatch" style="background:#F8F3EE;"></div>
+        <div class="swatch" style="background:#C4601A;"></div>
+        <div class="swatch" style="background:#7A6A5C;"></div>
+        <div class="swatch" style="background:#F0E4D8;"></div>
+      </div>
+      <div class="preview" style="background:#F8F3EE;">
+        <div class="preview-eyebrow" style="color:#C4601A;">Performance Consultant</div>
+        <div class="preview-heading" style="color:#130E0A;">I help teams fix the<br><em>real</em> problem.</div>
+        <div class="preview-body" style="color:#130E0A;">Most training fails because it treats a process problem like a knowledge problem.</div>
+        <a class="preview-btn" style="background:#130E0A; color:#C4601A;">View my work</a>
+        <span class="preview-tag" style="background:#F0E4D8; color:#7A6A5C;">AI-Assisted L&D</span>
+      </div>
+      <div class="dark-strip" style="background:#130E0A;">
+        <span class="dark-strip-text" style="color:#F8F3EE;">"Training is the last resort,<br>not the first response."</span>
+        <button class="dark-btn" style="background:#C4601A; color:#fff;">Hire me</button>
+      </div>
+    </div>
+
+    <!-- D: Slate + Cyan -->
+    <div class="card">
+      <div class="card-label">D — Slate + Cyan <span>tech-forward, clinical, sharp</span></div>
+      <div class="swatches">
+        <div class="swatch" style="background:#0A0F14;"></div>
+        <div class="swatch" style="background:#F4F6F8;"></div>
+        <div class="swatch" style="background:#28C4D4;"></div>
+        <div class="swatch" style="background:#5A7080;"></div>
+        <div class="swatch" style="background:#D8EEF2;"></div>
+      </div>
+      <div class="preview" style="background:#F4F6F8;">
+        <div class="preview-eyebrow" style="color:#1A9AAA;">Performance Consultant</div>
+        <div class="preview-heading" style="color:#0A0F14;">I help teams fix the<br><em>real</em> problem.</div>
+        <div class="preview-body" style="color:#0A0F14;">Most training fails because it treats a process problem like a knowledge problem.</div>
+        <a class="preview-btn" style="background:#0A0F14; color:#28C4D4;">View my work</a>
+        <span class="preview-tag" style="background:#D8EEF2; color:#5A7080;">AI-Assisted L&D</span>
+      </div>
+      <div class="dark-strip" style="background:#0A0F14;">
+        <span class="dark-strip-text" style="color:#F4F6F8;">"Training is the last resort,<br>not the first response."</span>
+        <button class="dark-btn" style="background:#28C4D4; color:#0A0F14;">Hire me</button>
+      </div>
+    </div>
+
+    <!-- E: Violet -->
+    <div class="card">
+      <div class="card-label">E — Violet <span>premium, unexpected, creative</span></div>
+      <div class="swatches">
+        <div class="swatch" style="background:#100D18;"></div>
+        <div class="swatch" style="background:#F7F5FA;"></div>
+        <div class="swatch" style="background:#8B5CF6;"></div>
+        <div class="swatch" style="background:#6A6478;"></div>
+        <div class="swatch" style="background:#EDE8F8;"></div>
+      </div>
+      <div class="preview" style="background:#F7F5FA;">
+        <div class="preview-eyebrow" style="color:#8B5CF6;">Performance Consultant</div>
+        <div class="preview-heading" style="color:#100D18;">I help teams fix the<br><em>real</em> problem.</div>
+        <div class="preview-body" style="color:#100D18;">Most training fails because it treats a process problem like a knowledge problem.</div>
+        <a class="preview-btn" style="background:#100D18; color:#8B5CF6;">View my work</a>
+        <span class="preview-tag" style="background:#EDE8F8; color:#6A6478;">AI-Assisted L&D</span>
+      </div>
+      <div class="dark-strip" style="background:#100D18;">
+        <span class="dark-strip-text" style="color:#F7F5FA;">"Training is the last resort,<br>not the first response."</span>
+        <button class="dark-btn" style="background:#8B5CF6; color:#fff;">Hire me</button>
+      </div>
+    </div>
+
+    <!-- F: Forest -->
+    <div class="card">
+      <div class="card-label">F — Forest <span>grounded, precise, natural</span></div>
+      <div class="swatches">
+        <div class="swatch" style="background:#0C1510;"></div>
+        <div class="swatch" style="background:#F5F4EF;"></div>
+        <div class="swatch" style="background:#3D8A58;"></div>
+        <div class="swatch" style="background:#607060;"></div>
+        <div class="swatch" style="background:#D8EAE0;"></div>
+      </div>
+      <div class="preview" style="background:#F5F4EF;">
+        <div class="preview-eyebrow" style="color:#3D8A58;">Performance Consultant</div>
+        <div class="preview-heading" style="color:#0C1510;">I help teams fix the<br><em>real</em> problem.</div>
+        <div class="preview-body" style="color:#0C1510;">Most training fails because it treats a process problem like a knowledge problem.</div>
+        <a class="preview-btn" style="background:#0C1510; color:#3D8A58;">View my work</a>
+        <span class="preview-tag" style="background:#D8EAE0; color:#607060;">AI-Assisted L&D</span>
+      </div>
+      <div class="dark-strip" style="background:#0C1510;">
+        <span class="dark-strip-text" style="color:#F5F4EF;">"Training is the last resort,<br>not the first response."</span>
+        <button class="dark-btn" style="background:#3D8A58; color:#fff;">Hire me</button>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

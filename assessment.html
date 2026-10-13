@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L&D Practice Assessment · Kristel Suntay</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap');
+
+:root {
+  --white:  #FFFFFF;
+  --off:    #F7F7F5;
+  --border: #E6E6E2;
+  --muted:  #8A8A8A;
+  --ink:    #111111;
+  --good:   #16A34A;
+  --good-tint: #F0FDF4;
+  --bad:    #DC2626;
+  --bad-tint: #FEF2F2;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 8px 24px 80px; }
+
+/* ---------- header ---------- */
+.topbar { position: sticky; top: 0; z-index: 20; background: var(--white); }
+.topbar-inner {
+  padding: 1rem clamp(1.25rem, 4vw, 3rem);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.nav-logo {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--ink); text-decoration: none; line-height: 1;
+}
+.nav-right2 { display: flex; align-items: center; gap: 1.5rem; }
+.topbar .counter {
+  color: var(--muted); font-size: 0.8rem; font-weight: 600; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  visibility: hidden;
+}
+.nav-back {
+  font-size: 0.82rem; font-weight: 500; color: var(--muted);
+  text-decoration: none; transition: color 0.15s;
+}
+.nav-back:hover { color: var(--ink); }
+.progress-track { height: 2px; background: var(--border); }
+.progress-fill { height: 100%; width: 0%; background: var(--ink); transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* ---------- cards ---------- */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2rem;
+  margin-top: 1.75rem;
+}
+.fade-in { animation: rise 0.4s ease; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.eyebrow {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+
+.section-label {
+  display: inline-block;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--muted);
+  background: var(--off);
+  border-radius: 4px;
+  padding: 0.24rem 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.q-number { font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-bottom: 0.4rem; }
+.q-stem {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem; font-weight: 600; line-height: 1.5;
+  margin-bottom: 1.4rem;
+}
+
+/* ---------- options ---------- */
+.option-btn {
+  display: flex; align-items: flex-start; gap: 12px;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem; line-height: 1.6;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.95rem 1.1rem;
+  margin-bottom: 0.6rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.option-btn:hover:not(:disabled) { border-color: var(--muted); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.option-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.option-btn:disabled { cursor: default; }
+.option-btn.correct { border-color: var(--good); background: var(--good-tint); }
+.option-btn.incorrect { border-color: var(--bad); background: var(--bad-tint); }
+.option-btn.dimmed { opacity: 0.5; }
+
+.opt-letter {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.75rem; color: var(--muted);
+  margin-top: 1px;
+}
+.option-btn.correct .opt-letter { border-color: var(--good); background: var(--good); color: #fff; }
+.option-btn.incorrect .opt-letter { border-color: var(--bad); background: var(--bad); color: #fff; }
+
+.opt-indicator {
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.9rem;
+  margin-top: 2px;
+  visibility: hidden;
+}
+.option-btn.correct .opt-indicator { visibility: visible; color: var(--good); }
+.option-btn.incorrect .opt-indicator { visibility: visible; color: var(--bad); }
+
+/* ---------- feedback modal ---------- */
+.feedback-backdrop {
+  position: fixed; inset: 0; z-index: 40;
+  background: rgba(17, 17, 17, 0.35);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.feedback-backdrop.visible { opacity: 1; pointer-events: auto; }
+.feedback {
+  position: fixed; left: 50%; top: 50%; z-index: 41;
+  width: min(560px, calc(100vw - 32px));
+  max-height: 82vh;
+  overflow-y: auto;
+  transform: translate(-50%, -50%) scale(0.96);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.4rem 1.5rem;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.feedback.visible { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+.feedback-head { display: flex; align-items: center; gap: 10px; }
+.verdict-icon {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 14px; font-weight: 700;
+}
+.verdict-icon.good { background: var(--good); }
+.verdict-icon.bad { background: var(--bad); }
+.feedback .verdict { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.feedback .verdict.good { color: var(--good); }
+.feedback .verdict.bad { color: var(--bad); }
+.feedback .cta { padding: 0.65rem 1.4rem; font-size: 0.9rem; }
+.feedback-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 1rem; }
+.review-answers {
+  background: none; border: none; font-family: inherit;
+  font-size: 0.85rem; color: var(--muted); cursor: pointer;
+  padding: 0.4rem 0; text-decoration: underline; text-underline-offset: 3px;
+}
+.review-answers:hover { color: var(--ink); }
+.feedback p { font-size: 1rem; color: #444; margin-top: 0.8rem; line-height: 1.65; }
+.next-mini {
+  position: fixed; left: 50%; bottom: 18px; z-index: 39;
+  transform: translateX(-50%);
+  display: none;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+.next-mini.visible { display: block; }
+
+/* ---------- buttons ---------- */
+.cta {
+  font-family: inherit;
+  font-size: 0.95rem; font-weight: 600;
+  color: #fff;
+  background: var(--ink);
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem 1.6rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.cta:hover { opacity: 0.75; }
+.cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.hidden { display: none !important; }
+
+#quizScreen { margin-bottom: 90px; }
+
+/* ---------- start screen ---------- */
+.hero-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem; font-weight: 600; letter-spacing: -0.01em;
+  line-height: 1.25; margin-bottom: 0.7rem;
+}
+.hero-sub { font-size: 1.05rem; color: #555; line-height: 1.7; }
+.meta-line { font-size: 0.88rem; color: var(--muted); margin-top: 0.9rem; }
+.actions { display: flex; align-items: center; gap: 16px; margin-top: 1.4rem; flex-wrap: wrap; }
+
+/* ---------- results ---------- */
+.score-row { display: flex; gap: 2.25rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: 0.4rem; }
+.score-big {
+  font-family: 'Poppins', sans-serif;
+  font-size: 3rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.score-pct { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+.band-box { flex: 1; min-width: 240px; }
+.score-band { font-family: 'Poppins', sans-serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.25rem; }
+.score-note { font-size: 0.95rem; color: #555; }
+
+h2.block-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1rem; font-weight: 600;
+  margin-top: 2rem;
+}
+
+.breakdown-list { margin-top: 0.7rem; }
+.review-hint { font-size: 0.88rem; color: var(--muted); margin-top: 0.35rem; }
+.b-row {
+  display: grid; grid-template-columns: 1fr auto auto; gap: 6px 16px;
+  padding: 0.75rem 0; border-bottom: 1px solid var(--off);
+  align-items: center;
+}
+.b-miss-hint { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.b-group summary.b-row { cursor: pointer; list-style: none; }
+.b-group summary.b-row::-webkit-details-marker { display: none; }
+.b-group summary.b-row:hover .b-miss-hint { color: var(--ink); }
+.b-group[open] summary.b-row { border-bottom-color: transparent; }
+.b-group-body { padding: 0 0 0.9rem; border-bottom: 1px solid var(--off); }
+.b-name { font-size: 0.95rem; }
+.b-score { font-size: 0.95rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.b-score.weak { color: var(--bad); }
+.b-score.strong { color: var(--good); }
+.b-track {
+  grid-column: 1 / -1;
+  height: 4px; border-radius: 2px;
+  background: var(--off); overflow: hidden;
+}
+.b-fill {
+  height: 100%; border-radius: 2px; background: var(--ink);
+  transform-origin: left;
+  animation: barIn 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.b-fill.weak { background: var(--bad); }
+.b-fill.strong { background: var(--good); }
+@keyframes barIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ---------- miss review ---------- */
+.review-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  margin-top: 0.6rem;
+  font-size: 0.95rem;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.review-item:hover { border-color: var(--muted); }
+.review-item summary {
+  list-style: none; cursor: pointer;
+  display: flex; gap: 0.7rem; align-items: baseline;
+  padding: 0.85rem 1.1rem;
+}
+.review-item summary::-webkit-details-marker { display: none; }
+.review-item summary .miss-q {
+  flex-shrink: 0; font-size: 0.7rem; font-weight: 700;
+  color: var(--muted); background: var(--off);
+  border-radius: 4px; padding: 0.14rem 0.5rem;
+}
+.review-item summary .miss-text {
+  flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-weight: 600; color: #555;
+}
+.review-item summary .chev {
+  flex-shrink: 0; margin-left: auto; color: var(--muted);
+  transition: transform 0.2s; align-self: center;
+}
+.review-item[open] summary .chev { transform: rotate(90deg); }
+.review-item .review-body { padding: 0 1.1rem 1rem; }
+.review-item .rq { font-weight: 600; margin-bottom: 0.5rem; }
+.review-item .ra { margin-bottom: 0.25rem; }
+.review-item .ra.yours { color: var(--bad); }
+.review-item .ra.right { color: var(--good); font-weight: 600; }
+.review-item .rr { margin-top: 0.5rem; color: #555; }
+
+/* ---------- responsive & motion ---------- */
+@media (max-width: 560px) {
+  .card { padding: 1.4rem 1.1rem; }
+  .hero-title { font-size: 1.6rem; }
+  .score-row { gap: 1.25rem; }
+  .feedback { width: calc(100vw - 24px); padding: 1.1rem 1.15rem; max-height: 78vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="nav-logo" href="index.html">KS</a>
+    <div class="nav-right2">
+      <div class="counter" id="counter">Question 1 of 65</div>
+      <a class="nav-back" href="index.html">Back to portfolio</a>
+    </div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</header>
+
+<div class="wrap">
+
+  <!-- START SCREEN -->
+  <div id="startScreen" class="card fade-in">
+    <div class="hero-title">L&amp;D Practice Assessment</div>
+    <p class="hero-sub">A 65-item scenario assessment that tests your judgment across performance analysis, instructional design, learning science, assessment, evaluation, and L&amp;D leadership.</p>
+    <p class="meta-line">About 40 minutes</p>
+    <div class="actions">
+      <button class="cta" id="startBtn">Start the assessment</button>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quizScreen" class="card hidden">
+    <span class="section-label" id="sectionLabel"></span>
+    <div class="q-number" id="qNumber"></div>
+    <div class="q-stem" id="qStem"></div>
+    <div id="options"></div>
+    <div class="feedback-backdrop" id="feedbackBackdrop"></div>
+    <div class="feedback" id="feedback" role="dialog" aria-modal="true">
+      <div class="feedback-head">
+        <span class="verdict-icon" id="verdictIcon"></span>
+        <div class="verdict" id="verdict"></div>
+      </div>
+      <p id="rationale"></p>
+      <div class="feedback-actions">
+        <button class="review-answers" id="reviewAnswersBtn">Review answers</button>
+        <button class="cta" id="nextBtn">Next question</button>
+      </div>
+    </div>
+    <button class="cta next-mini" id="nextMini">Next question</button>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen" class="card hidden">
+    <p class="eyebrow">Results</p>
+    <div class="score-row">
+      <div>
+        <div class="score-big" id="scoreBig"></div>
+        <div class="score-pct" id="scorePct"></div>
+      </div>
+      <div class="band-box">
+        <div class="score-band" id="scoreBand"></div>
+        <p class="score-note" id="scoreNote"></p>
+      </div>
+    </div>
+
+    <h2 class="block-title">Section breakdown</h2>
+    <p class="review-hint" id="reviewHint">Tap a section to review what you missed.</p>
+    <div class="breakdown-list" id="breakdownList"></div>
+
+    <div class="actions">
+      <button class="cta" id="restartBtn">Retake (reshuffled)</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SECTIONS = [
+  "Performance Analysis and Needs Assessment",
+  "Objectives and Task Analysis",
+  "Learning Science and Cognitive Load",
+  "Design Models and Strategy",
+  "Assessment and Measurement",
+  "Motivation and Adult Learning",
+  "Evaluation and Transfer",
+  "L&D Strategy and Leadership"
+];
+
+const BANDS = [
+  { min: 58, label: "Expert fluency", note: "You're not just recalling frameworks, you're applying them under ambiguity." },
+  { min: 49, label: "Strong practitioner", note: "Check which sections your misses cluster in." },
+  { min: 39, label: "Solid foundation with specific gaps", note: "The rationales in your miss review point to what to revisit." },
+  { min: 0,  label: "Foundations first", note: "Focus on performance analysis, learning science, and assessment design. They carry the most day-to-day weight." }
+];
+
+// a = index of correct option in the original (unshuffled) order
+const QUESTIONS = [
+{s:0,q:"A support team's error rate on refund processing doubled last quarter. The team lead requests a refresher course. Records show every support specialist passed the original refund certification at 95% or higher. What should you investigate first?",
+opts:["Whether the refund process or tooling changed recently","Whether the original course covered refunds in enough depth","Which support specialists have the highest error rates so the refresher can target them","Whether the certification assessment was too easy to pass"],a:0,
+r:"Skilled performers who suddenly degrade point to something changing in the environment, not skill decay, so the process or tooling is the first suspect. Re-examining the course or the certification re-litigates something that demonstrably worked, and targeting support specialists assumes training is the answer before diagnosing. This is Mager and Pipe's core move: rule out non-training causes first."},
+
+{s:0,q:"In role-play exercises, support specialists de-escalate angry customers skillfully. On live support tickets, QA shows they rarely attempt de-escalation and route straight to refunds. Which gap category best explains this pattern?",
+opts:["A knowledge gap, since they may not know when de-escalation applies","A skill decay problem, since role-play skills fade without reinforcement","An environment or consequence problem, since they can perform but choose not to","A transfer failure caused by low-fidelity role-play scenarios"],a:2,
+r:"They can do it, proven in role-play, but they don't. That is the classic 'could they do it if their lives depended on it?' test: if yes, it is not a skill gap. Look at incentives, time pressure, and consequences, since refunding is faster and safer for their metrics. Transfer failure is the tempting read, but that would show up as clumsy attempts, not zero attempts."},
+
+{s:0,q:"A stakeholder hands you a 60-slide policy deck and asks you to \"convert it to e-learning.\" Following action mapping, what is your first move?",
+opts:["Audit the deck for outdated or redundant slides","Identify the measurable business goal the training should move","Chunk the deck into modules aligned to its major topics","Interview learners to find which slides they find hardest"],a:1,
+r:"Action mapping starts at the center of the map: the measurable business goal. Everything else, including whether the deck's content survives at all, flows from what people must do to reach that goal. Auditing or chunking the deck accepts it as the curriculum, which is the exact failure action mapping exists to prevent."},
+
+{s:0,q:"A pricing policy changed last Tuesday. Support specialists are quoting the old price because nobody told them. The stakeholder requests a training module. What do you recommend?",
+opts:["A short microlearning module with a knowledge check on the new pricing","An announcement plus an updated reference article, with no course","A course now, plus a job aid for long-term reference","Folding it into next month's scheduled refresher so it reaches every support specialist systematically"],a:1,
+r:"This is an information gap, not a skill gap. Nobody needs practice to quote a new price; they need to know it exists and be able to look it up. A course adds cost and delay, and folding it into next month's refresher is systematic but leaves support specialists quoting the wrong price for weeks."},
+
+{s:0,q:"A task comes up roughly twice a year, involves 14 precise steps, and support specialists can consult references while doing it with no time pressure. What is the right intervention?",
+opts:["A memorization-focused course with spaced reinforcement, since infrequent tasks decay fastest","A step-by-step job aid, with at most a brief orientation to it","An annual refresher certification to guarantee readiness","A simulation so support specialists can practice until the steps are automatic"],a:1,
+r:"Infrequent, procedural, reference-permitted, no time pressure: the textbook job aid profile. Training for memorization fights human forgetting on a task where forgetting doesn't matter, because the reference is always available."},
+
+{s:0,q:"You're scanning support ticket data to find comprehension gaps worth training. Which pattern is the strongest signal?",
+opts:["Issue types with the highest support ticket volume","Issue types with the longest average handle time","Issue types where resolution takes the most back-and-forth replies with the customer","Issue types that support specialists say they find most confusing in surveys"],a:2,
+r:"High back-and-forth per resolution signals the support specialist is struggling to comprehend or resolve the issue. Volume measures demand, not difficulty. Handle time is confounded by task complexity. Self-report is useful but weaker than behavioral evidence."},
+
+{s:0,q:"A stakeholder opens with \"We need a two-hour workshop on empathy.\" What is the strongest consulting response?",
+opts:["Agree, then propose trimming it to one hour to respect support specialist capacity","Ask what support specialists would be doing differently on support tickets if the problem were solved","Schedule the workshop, then use the design kickoff to align on measurable outcomes","Ask which empathy framework they'd like the workshop built around"],a:1,
+r:"The stakeholder brought a solution; your job is to recover the problem. Asking what changed behavior would look like reopens the analysis without rejecting them. Scheduling first and aligning at kickoff sounds pragmatic but locks the solution in before the problem is known, and asking for a framework accepts the solution framing entirely."},
+
+{s:0,q:"New hires pass their knowledge assessments but fail QA on tone within their first month. Knowledge base articles on tone are accurate and current. Coaches confirm they rarely review tone with new hires. What is the most likely root cause?",
+opts:["The knowledge assessments are testing the wrong content","The KB articles are too long for new hires to apply in the moment","New hires lack practice with feedback, not information","Tone standards are unrealistic for the first month of ramp"],a:2,
+r:"Knowledge is verified (assessments passed, KB accurate). What's missing is the practice-with-feedback loop, and the absent coaching confirms it. Tone is a skill, and skills are built through attempted performance plus feedback, not information."},
+
+{s:1,q:"Which objective is best written?",
+opts:["Understand the refund eligibility policy","Given a refund request in Zendesk, process it correctly","Given a refund request and the policy page, decide whether to approve, deny, or escalate, correctly on at least 9 of 10 cases","Complete the refund module and score 80% on the final quiz"],a:2,
+r:"It has all three Mager components: condition (given a refund request and the policy page), behavior (decide approve, deny, or escalate), and criterion (9 of 10 correct). The Zendesk version lacks a criterion, the quiz version describes course activity rather than job performance, and 'understand' is unobservable."},
+
+{s:1,q:"What is the core flaw in this objective: \"This course will cover the five refund types and when each applies\"?",
+opts:["It lacks a measurable criterion","It describes what the course does, not what the learner will do","Five refund types is too much content for one objective","It doesn't specify the delivery modality"],a:1,
+r:"'The course will cover' makes the course the subject. Objectives describe learner performance. This matters practically: 'cover' can be satisfied by any content dump, while a performance statement forces design decisions."},
+
+{s:1,q:"The terminal objective is \"resolve failed payment tickets end to end.\" Which of these is an enabling objective for it?",
+opts:["Resolve failed payment tickets within the handle time target","Identify the failure reason from the payment error code","Demonstrate professionalism throughout the payment conversation","Pass the failed payments certification scenario"],a:1,
+r:"Enabling objectives are the sub-skills the terminal performance depends on, and identifying the failure code is a component skill of resolving the support ticket. Adding a handle time target just puts a criterion on the same terminal behavior, passing the certification is an assessment event, and professionalism is a parallel objective rather than a component of this one."},
+
+{s:1,q:"A reviewer flags the objective \"Appreciate the importance of data privacy when handling customer accounts.\" What is the most useful fix?",
+opts:["Add a criterion, such as \"appreciate it in 100% of interactions\"","Replace it with an observable behavior, such as \"verify account ownership before disclosing account details\"","Split it into separate objectives for appreciation and application","Keep it, but add a survey item where learners rate how much they value data privacy"],a:1,
+r:"'Appreciate' is unobservable, so the fix is to name the behavior that appreciation would produce. Putting a criterion on it leaves it just as unmeasurable, and a survey where learners rate how much they value privacy measures self-reported attitude, which is not the performance the objective needs."},
+
+{s:1,q:"You need to analyze how expert support specialists troubleshoot ambiguous billing discrepancies. Observation shows their visible steps, but their decisions look instant and invisible. What method fills the gap?",
+opts:["Document the standard operating procedure in finer-grained steps","Survey experts about which steps they consider most important","Have experts think aloud while working real cases, and probe the cues behind each decision","Time-and-motion study to find where experts are faster than novices"],a:2,
+r:"This is cognitive task analysis. Expert judgment is largely invisible and experts are poor at self-reporting it (that's the curse of knowledge), so you elicit it through think-alouds and cue probing on real cases. Finer-grained procedure documentation captures the visible layer, which you already have."},
+
+{s:1,q:"Audience analysis shows about half your learners lack a prerequisite skill the course assumes. Adding it to the main course would add 40 minutes for everyone. What is the best structural choice?",
+opts:["Add the 40 minutes for all learners, since the other half will benefit from review","Offer the prerequisite as a separate pre-module that learners can test out of","Cut the prerequisite and let learners pick it up on the job","Split the audience into two separate course versions maintained in parallel"],a:1,
+r:"Test-out preserves everyone's time: those who need the prerequisite get it, those who don't skip it. Adding it for everyone taxes half the audience, cutting it ships a course that fails half its learners, and parallel versions double maintenance forever."},
+
+{s:1,q:"The objective is \"Given a support ticket, select the correct macro and adapt it to the customer's situation.\" Which assessment matches this objective's cognitive level?",
+opts:["Match each macro name to its description","List the situations in which each macro applies","Given realistic sample support tickets, choose and edit the macro, scored against a rubric","Explain in your own words why macro adaptation matters for CSAT"],a:2,
+r:"The objective is application-level (select and adapt in context), so the assessment must be too. Matching and listing assess recall, which learners can pass while still failing the actual task. Matching assessment level to objective level is the alignment move that makes a course honest."},
+
+{s:1,q:"You must teach support specialists \"how a refund moves from approval through the payments system to the customer's bank.\" Support specialists never perform these steps themselves; they need this to answer customer questions about timing and status. What content type is this?",
+opts:["A procedure: an ordered series of steps one performer executes the same way each time","A process: how a system works across multiple actors and stages","A concept: a category of things recognized by shared features","A principle: a guideline applied with judgment across varied situations"],a:1,
+r:"Process versus procedure is the classification that changes the design. A procedure is steps the learner will perform, taught with demonstration and hands-on practice. A process is how a system works, performed by no single learner, so you teach it for understanding: a visual model of the stages, plus practice explaining or predicting what happens next. Misclassify this as a procedure and you build step-practice for steps nobody performs. (Content types per Clark: fact, concept, process, procedure, principle.)"},
+
+{s:2,q:"A module has narration that reads the on-screen paragraphs word for word. Reviewers say it feels thorough. What does the evidence say you should do?",
+opts:["Keep both, since dual channels reinforce the message","Cut the narration and keep the text, since reading is faster","Cut the duplicated on-screen text down to keywords, or remove it, and let narration carry the words","Offer a toggle so learners can pick their preferred mode"],a:2,
+r:"Redundancy principle (Mayer). Identical narration plus full on-screen text forces learners to reconcile two verbal streams and overloads processing. Narration with graphics, or text alone, beats both together. 'Dual channels reinforce' is the intuitive-but-wrong belief."},
+
+{s:2,q:"A process diagram appears on one slide and the explanation of its parts appears on the next slide. Learners keep flipping back and forth. Which multimedia principle is this design violating?",
+opts:["Segmenting: content should be broken into learner-paced chunks","Spatial contiguity: corresponding words and graphics should appear near each other","Signaling: cues should direct attention to the essential material","Coherence: interesting but extraneous material should be cut"],a:1,
+r:"Separating mutually referring information forces learners to hold one piece in working memory while hunting for the other, which is the split-attention effect. The violated principle is spatial contiguity: corresponding words and graphics belong near each other. The cognitive load literature calls the corrected layout an integrated format, so you'll see both terms. Signaling would help learners find their place but wouldn't remove the separation."},
+
+{s:2,q:"You're designing practice for two audiences: brand-new hires and support specialists with two years of tenure. What does the research on worked examples suggest?",
+opts:["Both groups learn best from studying complete worked examples before trying problems","Both groups learn best from solving problems, since struggle drives learning","New hires benefit from worked examples first; tenured support specialists learn more from solving problems directly","Tenured support specialists need worked examples more, since their habits are harder to change"],a:2,
+r:"The expertise reversal effect. Worked examples reduce load for novices; for experienced learners the same scaffolding becomes redundant and problem-solving practice wins. One practice design for both audiences shortchanges one of them."},
+
+{s:2,q:"Learners finish a module Friday. Which follow-up activity most improves their retention for a check three weeks later?",
+opts:["Re-watching the module's summary video on Monday","Receiving a one-page recap document to re-read","Taking a short, low-stakes quiz on the content Monday, without notes","Highlighting the most important lines in the transcript"],a:2,
+r:"Retrieval practice. Testing yourself strengthens memory far more than re-exposure. Re-watching, re-reading, and highlighting are all re-exposure, which feels productive because the material feels familiar, and that familiarity is exactly the illusion."},
+
+{s:2,q:"You have four hours of live training time. Which schedule most likely produces durable learning?",
+opts:["One four-hour session, so momentum builds and context stays loaded","Four one-hour sessions spread across two weeks","Two two-hour sessions on consecutive days","One four-hour session plus an optional recording for review"],a:1,
+r:"The spacing effect. Distributed sessions produce more durable learning than a massed block of equal total time, largely because each session forces some effortful re-retrieval. A single long block is how calendars prefer it, not how memory works."},
+
+{s:2,q:"To make a dry compliance module engaging, a designer adds fun facts, a mascot animation between sections, and a story about a famous fraud case only loosely related to the procedures. What does the evidence predict?",
+opts:["Engagement and learning both improve, since attention is the bottleneck","Learning of the core material drops, because interesting-but-irrelevant material competes for working memory","Learning improves for novice learners, who need the motivational support most","Learning improves only if the extras are placed at section boundaries"],a:1,
+r:"The seductive details effect. Interesting-but-irrelevant material draws working memory away from the core content and disrupts its coherence. The 'novices need the motivational support' read is backwards: low-knowledge learners are hurt most by seductive details, because they can't yet tell core from decoration."},
+
+{s:2,q:"SMEs deliver a 40-minute screen recording walking through a complex tool. Learners must watch it. What is the highest-impact restructuring?",
+opts:["Speed the recording up and add captions","Break it into short learner-paced segments, each followed by a chance to try or answer something","Add a table of contents so learners can jump around","Replace it with a text-based manual covering the same steps"],a:1,
+r:"Segmenting principle plus active responding. Learner-paced short segments with something to do between them beats every passive improvement to the same 40-minute stream. The other fixes optimize a passive experience instead of converting it into an active one."},
+
+{s:2,q:"Pilot groups take two versions of the same course. Version A presents worked solutions to study; learners rate it highly and feel confident. Version B makes learners attempt each case before revealing the solution; ratings are lower and learners say it felt harder. The two versions tie on the immediate end-of-course quiz. Three weeks later, on a test using new, unfamiliar cases, Version B outperforms Version A by a wide margin. What should you ship, and why?",
+opts:["Version A: the delayed difference will wash out with on-the-job experience, and its higher ratings mean more learners will finish","Version B: the delayed test on new cases is the best proxy for job performance, and the effortful attempts are what produced that edge","Version A, with a booster quiz added at week three so its retention catches up","Version B, but with the pre-reveal attempts made optional so it keeps the delayed advantage while matching Version A's ratings"],a:1,
+r:"Desirable difficulties. Generation and retrieval effort during learning feels worse and works better, and here the payoff shows exactly where it matters: delayed performance on unfamiliar cases, the closest stand-in for the job. The immediate-quiz tie is the expected pattern, since fluent instruction looks equivalent right after learning and the difference appears with delay. Making the attempts optional removes the mechanism that produced the advantage, and bolting a booster onto Version A adds retrieval later without the generation effort during learning."},
+
+{s:2,q:"Support specialists must learn to tell apart four similar support ticket types that are often confused. How should practice be sequenced?",
+opts:["Master support ticket type 1 fully, then type 2, then 3, then 4","Mix all four types within the same practice sets so learners must discriminate between them","Teach only the most common type deeply, since it covers most volume","Teach the definitions of all four first, then practice only the hardest one"],a:1,
+r:"Interleaving. Discriminating between confusable categories is precisely what mixed practice trains and blocked practice doesn't: in blocked practice, learners never have to ask 'which type is this?' because the block already told them."},
+
+{s:2,q:"A process module overwhelms learners with unfamiliar interface names, statuses, and role terms all introduced mid-process. What does the pre-training principle suggest?",
+opts:["Add a glossary link learners can open at any time","Teach the key components and terms first, then teach the process that uses them","Cut the process explanation down to the happy path so fewer terms are needed","Introduce each term with a mnemonic at the moment it first appears"],a:1,
+r:"Pre-training principle. Teaching component names and characteristics first frees working memory to process the process itself. A glossary still forces mid-process lookups, and cutting to the happy path trades coverage for load while still dumping the remaining terms mid-process."},
+
+{s:2,q:"A module teaches a complex on-screen workflow with an animation plus explanation. According to dual channel processing, which design uses learners' processing capacity best?",
+opts:["Spoken narration plays while the animation runs","An explanatory text panel sits beside the animation","Narration and matching on-screen text both accompany the animation","The full narration plays first, then the animation runs silently"],a:0,
+r:"Working memory takes words in through an auditory channel and images through a visual channel, each with its own limited capacity. Narration over animation splits the work across both channels. A text panel sends words and animation through the same visual channel, where they compete (this is why the modality principle favors narration). Adding narration plus text duplicates words across channels, the redundancy problem. Playing narration first and animation after separates corresponding words and pictures in time, so learners must hold the whole explanation in memory while watching."},
+
+{s:2,q:"This on-screen text is headed for an e-learning module: \"The Refund Eligibility Verification Process must be initiated by the support specialist prior to the issuance of any refund. It is important to note that failure to complete verification may result in the transaction being flagged by Finance. The verification workflow can be accessed via the Billing tab.\" What is the highest-impact revision?",
+opts:["Rewrite it in second person, active voice, action first: \"Before you issue a refund, verify eligibility in the Billing tab. Skipping this flags the transaction with Finance.\"","Break the three sentences into a bulleted list so each point stands alone","Add a screenshot of the Billing tab beside the text so learners see where to go","Bold the critical terms (verification, flagged, Billing tab) so skimmers catch them"],a:0,
+r:"The passage's problem is the prose itself: passive voice, buried actions, and filler ('It is important to note') that hides who does what. Rewriting in second person and active voice with the action first fixes comprehension at the source, and conversational style has direct evidence behind it (Mayer's personalization principle). Bullets, screenshots, and bolding all format the same broken sentences."},
+
+{s:3,q:"Post-mortems keep showing the same failure: courses that are well built, well received, and don't move the metric they were commissioned for. Which phase of the design process is most likely being skipped or rushed?",
+opts:["Analysis","Design","Development","Evaluation"],a:0,
+r:"Well built and well received means design, development, and delivery worked. Missing the metric it was commissioned for means it solved the wrong problem, and the wrong problem gets locked in during analysis."},
+
+{s:3,q:"A stakeholder can't articulate what they want, keeps changing direction after seeing polished drafts, and the deadline is tight. Which process adjustment fits best?",
+opts:["Freeze requirements in a signed design document before any build begins","Build rough functional prototypes early and iterate on them with the stakeholder","Skip stakeholder reviews until the course is complete to avoid churn","Extend the analysis phase until requirements stabilize"],a:1,
+r:"This is the situation iterative models (SAM, rapid prototyping) exist for. Stakeholders who can't articulate needs can react to artifacts. Freezing requirements formalizes requirements that don't exist yet, and extending analysis delays without producing the thing the stakeholder needs to react to."},
+
+{s:3,q:"A lesson states the objective, presents the content clearly, and ends with a graded quiz. Learners fail the quiz at high rates. Judged against Gagné's nine events, what is the most likely missing ingredient?",
+opts:["Gaining attention at the start","Stimulating recall of prior learning","Guided practice with feedback before the assessment","Enhancing retention and transfer at the end"],a:2,
+r:"The described lesson jumps from presentation straight to graded assessment. Gagné's events 5 and 6 (guidance, elicited practice with feedback) are where learning actually consolidates. High failure on a quiz after clear content is the signature of missing practice."},
+
+{s:3,q:"Per Merrill's first principles, which course structure is strongest?",
+opts:["Topics sequenced logically from foundational concepts to advanced ones, with a case study at the end","A progression of real whole tasks, starting simple and growing in complexity, with concepts taught as each task demands them","Learner-chosen modules in any order, to maximize autonomy","Concepts first, procedures second, and problem-solving reserved for on-the-job time"],a:1,
+r:"Merrill's first principles are task-centered: learning is promoted when learners work through a progression of real whole tasks, with instruction activated as the tasks demand it. The topic-first structure bolts the task on at the end, and free module choice confuses autonomy with structure."},
+
+{s:3,q:"In backward design, what do you create immediately after defining the learning goals?",
+opts:["The assessment evidence that would prove learners met the goals","The sequence of instructional activities","The content outline organized by topic","The engagement hooks for each section"],a:0,
+r:"Backward design's defining move: define acceptable evidence before designing activities. It prevents the common failure where activities feel aligned but nothing in the course would actually prove the goals were met."},
+
+{s:3,q:"Which opening best serves the \"gain attention\" event for a module on identity verification?",
+opts:["A striking statistic on how many account takeover attempts hit the platform each month","A real anonymized case where skipped verification led to an account takeover the learner will now work through","A welcome video from the department lead about why security matters","A pre-quiz on the module's terminology"],a:1,
+r:"Attention in Gagné's sense means orienting the learner to the problem the lesson exists to solve, and a real consequential case does that while also creating relevance. The striking statistic is the strong distractor: it grabs attention but points it nowhere, since the learner has nothing to do with it. The welcome video and pre-quiz are legitimate elements but not attention-gaining ones."},
+
+{s:3,q:"You're designing a blended program with limited live facilitator time. Which allocation uses the live time best?",
+opts:["Live sessions deliver the core content; self-paced modules provide optional practice","Self-paced modules deliver the content; live sessions run practice, feedback, and discussion of hard cases","Live sessions repeat the self-paced content for reinforcement","Live sessions handle administration and Q&A; everything else is self-paced"],a:1,
+r:"Flipped allocation. Live time is the scarcest, most expensive asset, so spend it on what only live interaction does well: practice, feedback, discussion of judgment calls. Content transmission is what self-paced does well."},
+
+{s:3,q:"Branching scenarios cost roughly triple what linear modules cost to build. For which task is the investment most justified?",
+opts:["Teaching the fixed steps to submit an escalation form","Teaching judgment calls where the right response depends on reading the customer's situation and consequences unfold over the conversation","Teaching the definitions in a new product taxonomy","Teaching a policy that changes quarterly, since branching is easier to update"],a:1,
+r:"Branching earns its cost where the skill is judgment with consequences, because branches let learners experience how decisions play out. Fixed procedures and definitions are linear or declarative, so branching adds cost without adding learning. And the update argument is backwards: branching is harder to update."},
+
+{s:3,q:"Support specialists must learn to recognize which incoming support tickets count as \"billing disputes\" as opposed to several lookalike categories. Which instructional method fits this content type?",
+opts:["A clear definition, then matched examples and non-examples that get progressively harder to tell apart, with classification practice and feedback","A demonstration of resolving one billing dispute end to end, followed by guided practice on similar support tickets","An annotated flowchart showing how a dispute moves through each resolution stage","A checklist of the qualifying criteria that support specialists keep at their desk"],a:0,
+r:"Recognizing category membership is concept learning, and concepts are taught with definitions plus examples and non-examples, sequenced from obvious to borderline, with classification practice. Demonstration-plus-practice teaches procedures, the annotated flowchart teaches processes, and the checklist is a job aid: useful, but it doesn't build the fast recognition the task needs, and it does nothing for lookalikes that don't match the words on the list."},
+
+{s:4,q:"In this item, which distractor most needs rewriting? \"A customer's payment fails with error code 402. The first step is to: (A) check the card's expiry and retry rules, (B) escalate to the payments team, (C) offer a refund, (D) do nothing because error codes resolve themselves.\"",
+opts:["Option A, because it contains two actions","Option B, because escalation is sometimes correct","Option C, because refunds are a different workflow","Option D, because no test-taker would choose it, so it makes guessing easier"],a:3,
+r:"A distractor no one picks does no work: it shrinks the effective options from four to three and raises the guessing odds. Good distractors are wrong answers that people with specific misconceptions would actually choose. 'Escalation is sometimes correct' is a strength, not a flaw: plausible-sometimes is what makes a distractor discriminating."},
+
+{s:4,q:"A certification quiz produces very consistent scores: support specialists who retake it score nearly the same each time. QA data shows quiz scores barely correlate with on-ticket performance. How do you characterize this quiz?",
+opts:["Reliable and valid","Reliable but not valid","Valid but not reliable","Neither reliable nor valid"],a:1,
+r:"Consistency is reliability; measuring what matters is validity. Consistent scores that don't track job performance mean the quiz reliably measures something, just not the right something. Reliability is necessary for validity but never sufficient."},
+
+{s:4,q:"For a role certification, how should the pass standard be set?",
+opts:["Against a fixed competence standard, regardless of how many pass","So that scores curve around the cohort average, keeping pass rates stable","At 80%, the widely accepted industry benchmark","Benchmarked to the average score of currently certified support specialists"],a:0,
+r:"Certifications are criterion-referenced: the question is 'can this person do the job to standard,' and the answer can't depend on who else took the test. Curving imports norm-referenced logic, 80% is convention masquerading as a standard, and benchmarking to current support specialists' average is norm-referencing in disguise: it defines the standard by the cohort, not the job."},
+
+{s:4,q:"Item analysis on a certification shows one question that your strongest performers miss more often than your weakest performers. What does this pattern most likely mean?",
+opts:["The item is appropriately difficult and separates the truly expert","Strong performers overthink simple questions, which is expected","The item is probably flawed, miskeyed, or reads differently to experts, and should be reviewed before counting toward scores","The content it tests wasn't covered well and needs more instruction"],a:2,
+r:"Negative discrimination. When your best performers miss an item disproportionately, the item is usually the problem: miskeyed, ambiguous, or written so that deeper knowledge suggests a different answer. 'It separates the truly expert' is the flattering misread."},
+
+{s:4,q:"What is the primary job of the ungraded knowledge checks placed throughout a module?",
+opts:["To prepare learners for the format of the final assessment","To create retrieval practice and give corrective feedback while stakes are low","To let learners gauge their readiness before the graded final","To keep attention by adding an interaction every few screens"],a:1,
+r:"Knowledge checks are formative: low-stakes retrieval plus corrective feedback while errors are still cheap. Readiness-gauging and pacing are real side benefits, but they're side benefits. If a knowledge check is graded and feedback-free, it's a small summative test wearing the wrong name."},
+
+{s:4,q:"The objective is \"de-escalate an angry customer in live chat.\" Which assessment is the strongest evidence of competence?",
+opts:["A multiple-choice test on de-escalation principles and step order","A written reflection on a past difficult customer interaction","A live or simulated chat with an angry customer persona, scored against a rubric","A timed quiz identifying which replies are de-escalating and which are not"],a:2,
+r:"Authenticity: the assessment should sample the performance itself, or the closest feasible simulation of it. The multiple-choice and identification quizzes test knowledge about de-escalation, which people can hold without being able to perform under pressure."},
+
+{s:4,q:"You want to know whether support specialists actually apply a new troubleshooting framework on real support tickets, two months after training. Which measure is strongest?",
+opts:["A survey asking support specialists how often they use the framework","Scores from the end-of-course assessment","QA review of a sample of their real support tickets against the framework's markers","Course completion and satisfaction rates for the cohort"],a:2,
+r:"Behavior (Kirkpatrick Level 3, LTEM Tier 7) is measured by observing behavior, and QA review of real support tickets is direct evidence. Self-report surveys are inflated and unreliable, end-of-course scores measure learning rather than application, and completions plus satisfaction measure even less."},
+
+{s:4,q:"Your post-course survey asks \"How satisfied were you with this training?\" and scores are consistently high while behavior change is consistently low. What is the most useful revision to the survey?",
+opts:["Add more granular satisfaction dimensions, such as pacing and visuals","Replace satisfaction items with questions about what learners will do differently and what might stop them","Make the survey anonymous so ratings become more honest","Move the survey to two weeks post-course so ratings settle"],a:1,
+r:"Satisfaction barely predicts application. Asking learners what they'll do differently and what barriers they anticipate turns the survey into a leading indicator of transfer and surfaces obstacles you can act on. This is Thalheimer's performance-focused smile sheet argument."},
+
+{s:4,q:"You must set the pass mark for a new high-stakes certification. Which approach is most defensible?",
+opts:["Use 80%, since that is the organization's convention for certifications","Set it so the historical pass rate stays near 90% to avoid retake load","Have qualified judges estimate, item by item, how a borderline-competent support specialist would perform, and build the cut score from those judgments","Set it one standard deviation below the pilot cohort's mean score"],a:2,
+r:"That's the Angoff method, the defensible standard-setting approach for high-stakes assessments: the cut score derives from expert judgment about borderline competence, item by item. A flat 80% is arbitrary convention, and the pass-rate and cohort-mean approaches let the cohort define the standard."},
+
+{s:4,q:"A knowledge check's feedback for a wrong answer reads: \"Incorrect. The correct answer is B. Review the eligibility criteria covered earlier in this lesson.\" What is the most important improvement?",
+opts:["Explain why the chosen answer fails in this scenario and why the correct one works, so the feedback teaches instead of just correcting","Soften the opening, since starting with \"Incorrect\" discourages learners","Replace the review instruction with a direct link to the eligibility criteria screen","Withhold the correct answer and prompt a second attempt, so learners retrieve it rather than read it"],a:0,
+r:"Evidence on feedback consistently favors elaboration: knowing the correct response plus why, tied to the learner's actual error, outperforms verification alone. The second-attempt option is the strong distractor because retrieval is real, but a retry without explanation invites guessing, and the learner who guesses right still doesn't know why. Tone and links are polish on feedback that isn't teaching anything yet."},
+
+{s:5,q:"You're opening a module on a policy update for tenured support specialists. Which opening aligns best with how experienced adults engage with learning?",
+opts:["The history of the policy and why the company adopted it originally","The specific support ticket situations where the old approach now fails them, and what this module fixes","A section-by-section summary of exactly what changed in the policy","An icebreaker poll about support specialists' feelings on policy changes"],a:1,
+r:"Adults engage when learning is problem-centered and immediately applicable (Knowles). Opening with where the old approach now fails them answers 'why does this matter to my Monday' in the first minute. The section-by-section change summary is the tempting one: it respects their time, but it is content-first, and it assumes the attention the problem-first opening earns."},
+
+{s:5,q:"Annual compliance training draws resentment: support specialists call it a box-ticking exercise. Completion is fine; attention is not. Which change most directly targets the motivation problem?",
+opts:["Add gamification: points, badges, and a leaderboard","Rebuild it around real consequences and cases from their own queue, and cut everything that doesn't change what they do","Add a stricter final assessment so learners must pay attention to pass","Open with a senior leader video explaining why compliance matters to the company"],a:1,
+r:"The resentment signals a relevance deficit: learners believe, often correctly, that the training doesn't change anything they do. Rebuilding around real consequences and cutting non-actionable content attacks that belief directly. Gamification decorates the problem, a stricter test adds pressure without adding meaning, and a leader video asserts relevance where rebuilt content demonstrates it."},
+
+{s:5,q:"Learners start a challenging course enthusiastically, then disengage midway. Feedback says \"I stopped believing I could get this.\" Within the ARCS model, which component should you redesign for?",
+opts:["Attention, with more varied and surprising content","Relevance, by connecting content more tightly to their goals","Confidence, by scaffolding early wins and making success criteria visible and reachable","Satisfaction, by adding recognition and rewards at the end"],a:2,
+r:"'I stopped believing I could get this' is a confidence statement, verbatim. The ARCS response is scaffolded early success, visible progress, and reachable criteria. Relevance is the trap for people who reflexively equate all motivation problems with relevance."},
+
+{s:5,q:"A stakeholder asks you to build three versions of a course for visual, auditory, and kinesthetic learners. What does the evidence support telling them?",
+opts:["Agree, since matching instruction to learning styles improves outcomes","Matching modality to the learner doesn't improve learning; matching modality to the content does, and well-designed multimodal instruction helps everyone","Build one course but offer each lesson as either a video or an article, letting learners pick their preferred format","Survey learners for their styles first so the three versions can be assigned correctly"],a:1,
+r:"The learning styles hypothesis (matching instruction to a diagnosed style improves learning) has repeatedly failed empirical tests. What works is matching modality to the content and using well-designed multimodal instruction for everyone. Letting learners pick their format per lesson is the myth in softer clothes and doubles the build cost, and surveying styles first just operationalizes the myth more rigorously."},
+
+{s:6,q:"Training practice uses short, clean, single-issue sample support tickets. On the job, support tickets are long, messy, and bundle multiple issues. Learners pass the course and struggle on the floor. What is the highest-leverage fix?",
+opts:["Add more practice volume using the existing clean support tickets","Make practice support tickets progressively resemble real ones: messy, multi-issue, with irrelevant details to sift","Extend the course with an advanced theory module on complex support tickets","Add a capstone exam with harder versions of the same clean support tickets"],a:1,
+r:"Transfer depends on shared elements between practice and performance. Clean single-issue practice builds a skill the job never asks for in that form. Progressively realistic practice, including irrelevant details to sift, closes the gap. More volume gives more of the wrong practice, and a harder capstone on the same clean support tickets raises difficulty without adding realism. Difficulty is not fidelity."},
+
+{s:6,q:"Six weeks after a strong workshop, observed behavior has drifted back to old habits. Which follow-up architecture best sustains the new behavior?",
+opts:["A weekly email series recapping the workshop's key points for six weeks","Spaced retrieval prompts and micro-scenarios over the following weeks, plus coaches reinforcing the behavior in regular support ticket reviews","Schedule the identical workshop again each quarter","Add the behavior to the QA scorecard with no other support"],a:1,
+r:"Behavior change survives on spaced reinforcement plus environmental support. Retrieval prompts fight forgetting; coach reinforcement makes the behavior socially and operationally expected. The weekly recap email is the tempting one because it is spaced, but reading recaps is re-exposure, not retrieval, and it adds no environmental support. Scoring without support measures while doing nothing."},
+
+{s:6,q:"CSAT for password-reset tickets rose four points in the month after your training launched. That same week, engineering shipped a fix that halved reset failures. What is the honest read, and what would have prevented the ambiguity?",
+opts:["Credit the training; it launched first, so the timing supports it","Split the credit evenly between training and the fix","The effect can't be attributed; a phased rollout or comparison group trained later would have isolated the training's contribution","Compare each support specialist's post-training CSAT to their own pre-training baseline to isolate the training's effect"],a:2,
+r:"Two interventions landed in the same window on the same metric, so attribution is impossible after the fact. Phased rollouts or a later-trained comparison group build attribution into the design. The pre-post comparison is the seductive one: each support specialist's own baseline can't help, because the product fix moved everyone's post-period at the same time."},
+
+{s:6,q:"A program rolled out to 200 support specialists with mixed results. You have one week to learn why it works for some and not others. Which evaluation approach fits?",
+opts:["Survey all 200 support specialists on satisfaction and self-reported application","Deep interviews with a handful of the most successful adopters and a handful of clear non-adopters, then verify their accounts against support ticket data","Run a statistical analysis across all 200 support specialists' metrics to find which variables predict success","Focus groups sampled randomly across the middle of the distribution"],a:1,
+r:"Brinkerhoff's Success Case Method: study the extremes, because the most and least successful cases hold the causal story, then verify against hard data. The statistical sweep is the tempting rigor, but in a week it can find correlates without the story behind them, and SCM exists precisely to get credible causal texture fast. Surveys and middle-of-distribution focus groups average away the signal."},
+
+{s:6,q:"Your LMS dashboard reports completions, time spent in modules, and interaction clicks, and these are presented as evidence the program is working. In LTEM terms (Thalheimer's Learning-Transfer Evaluation Model), what is the problem?",
+opts:["These are Tier 1 and Tier 2 measures, attendance and activity, which learners can produce without having learned anything","These are Tier 3 measures, which capture perception rather than performance","These measures only become meaningful once a full cohort has finished","These measures are valid for self-paced modules but not for facilitated programs"],a:0,
+r:"LTEM's bottom tiers are attendance (Tier 1) and activity (Tier 2), and its central argument is that organizations routinely stop there: completions and clicks measure exposure, not learning. Perception sits at Tier 3, knowledge at Tier 4, and the model keeps climbing through decision-making competence (5), task competence (6), transfer (7), and effects of transfer (8). Cohort size and delivery format have nothing to do with the critique."},
+
+{s:6,q:"A course assessment presents realistic support ticket scenarios and asks learners to choose what they would do next, with each scenario hinging on a judgment call. Where does this sit in LTEM, and what would make the evidence one tier stronger?",
+opts:["Tier 4, knowledge: stronger would be asking learners to also explain their reasoning","Tier 5, decision-making competence: stronger would be having them perform the full task, not just decide","Tier 6, task competence: stronger would be observing them on the job","Tier 3, learner perceptions: stronger would be testing recall of the decision criteria"],a:1,
+r:"Scenario-based decision items are LTEM Tier 5, decision-making competence: the learner demonstrates they can choose well in realistic situations. One tier up is Tier 6, task competence, where they actually perform the task, and above that is Tier 7, transfer to the real job. The ladder matters because each step up buys a stronger claim: deciding well in scenarios doesn't prove someone can execute, and executing in training doesn't prove they'll do it on the floor."},
+
+{s:7,q:"Your team has capacity for three of five requested projects this quarter. Which prioritization basis is strongest?",
+opts:["Expected impact on business metrics weighed against effort, with explicit deferrals communicated to the other two requesters","First come, first served, since it is the most defensible to stakeholders","The seniority of the requesting stakeholder, since sponsorship predicts adoption","Quickest wins first, to build the team's credibility for bigger asks"],a:0,
+r:"Portfolio decisions are impact-per-effort decisions, and the explicit deferrals are what keep trust with the requesters who didn't make the cut. First come, first served is fair-sounding but ignores value. Seniority-based picks buy sponsorship at the cost of impact. Quick wins first has a real kernel, credibility compounds, but as the standing basis it systematically starves the highest-impact work."},
+
+{s:7,q:"A vendor's off-the-shelf course covers 70% of what your support specialists need at a fraction of custom-build cost. The missing 30% is your org-specific workflow. What is the strongest move?",
+opts:["Buy the course, and build a custom module with practice for the org-specific workflow","Build fully custom, since generic content erodes learner trust","Buy the course and rely on managers to explain the org-specific parts on the floor","License the course only if the vendor agrees to customize the missing 30%"],a:0,
+r:"Buy the commodity, build the differentiator. The org-specific workflow is exactly the part worth custom effort, and the generic 70% is exactly the part not worth rebuilding. Relying on managers to cover the gap outsources the hardest part to the floor, and vendor customization sounds clean but is typically slow, expensive, and locked to their roadmap."},
+
+{s:7,q:"A vendor pitch claims their platform \"boosts retention by 40%,\" citing an internal study where learners who used its optional review features scored higher than those who didn't. What is the flaw a learning lead should catch?",
+opts:["Self-selection: learners who choose to review differ systematically from those who don't, so the comparison can't isolate the platform's effect","The study is internal, and only third-party research counts as evidence","Retention should be measured with surveys, not scores","The effect is too large to be plausible, so the data is likely fabricated"],a:0,
+r:"Learners who opt into review features are more motivated and organized before the platform does anything, so the groups differ at baseline. That is self-selection, and it can manufacture a 40% gap out of nothing. Internal studies can still be informative and large effects do exist; the giveaway is the comparison design, not the source or the size."},
+
+{s:7,q:"You're a learning lead reviewing a designer's storyboard before build. Which signal should most concern you?",
+opts:["The knowledge checks quiz definitions while the objectives promise learners will handle live scenarios","The module runs 22 minutes when the intake estimated 15","The storyboard uses a different slide template than the team standard","The tone is more casual than previous courses on this topic"],a:0,
+r:"Assessment misaligned with objectives is a validity failure: the course will certify people who can recite definitions while promising the business they can handle live scenarios. Duration creep, template drift, and tone are legitimate review notes, but they are polish. A lead's review exists to catch the failure that survives polish."},
+
+{s:7,q:"A well-designed program is launching to 300 support specialists whose team leads weren't involved in its development. What is the biggest launch risk, and the move that addresses it?",
+opts:["Frontline leads may not reinforce or model the change; brief them first and give them a visible role in the rollout","Support specialists may find the content too hard; add a pre-assessment","The LMS may buckle under load; stagger enrollment","Completion may lag; tie it to performance reviews"],a:0,
+r:"Manager support is one of the strongest known predictors of training transfer. Leads who weren't involved won't reinforce the change, and their indifference reads as permission to skip it. Briefing them and giving them a rollout role converts the biggest risk into the strongest lever. Tying completion to performance reviews gets compliance, not adoption."},
+
+{s:7,q:"An executive asks, \"What did we get for last quarter's training spend?\" Which answer earns credibility?",
+opts:["Completions, hours delivered, and satisfaction averages across the portfolio","The movement in the business metrics each program targeted, with honest notes on attribution limits","A showcase of the most innovative courses the team shipped","Benchmarks showing the team delivered more hours per designer than industry average"],a:1,
+r:"The executive asked about return, so answer in the currency they asked in: the metrics each program targeted and what moved, with attribution limits stated plainly. Honest limits build more credibility than confident overreach. Completions and hours are activity, not value, and delivery benchmarks measure busyness."},
+
+{s:7,q:"A stakeholder needs a program in six weeks. Honest scoping says quality delivery takes ten. Which response serves the organization best?",
+opts:["Commit to six weeks and absorb the gap with overtime, since the business need is real","Negotiate scope: identify the smallest slice that moves the metric by week six, and schedule the rest","Decline the timeline and offer the ten-week plan as the only responsible option","Deliver a lighter-fidelity version of the full scope in six weeks and patch it after launch"],a:1,
+r:"Negotiating scope holds both truths: the deadline is real and quality takes time, so ship the smallest slice that moves the metric and schedule the rest. Absorbing the gap with overtime hides the real cost and sets the precedent. Refusing outright protects quality but reads as unresponsive. Shipping the full scope at low fidelity delivers everything except the outcome."},
+
+{s:7,q:"Two designers on your team consistently produce content-heavy, practice-light courses. As their lead, which intervention builds capability best?",
+opts:["Rewrite their storyboards yourself before build so quality stays high","Set an explicit review standard (every objective needs practice with feedback), coach against it on real projects, and have them revise their own work","Send them to an instructional design certification course","Pair them with the team's strongest designer to absorb their approach"],a:1,
+r:"Capability grows when the standard is explicit and people revise their own work against it with coaching. Rewriting their storyboards keeps this quarter's quality high while guaranteeing they never build the skill. The certification course is the ironic trap: an information solution to a practice-and-feedback problem. Pairing can help, but 'absorb the approach' is hope, not a mechanism."}
+];
+
+// ---------- state ----------
+let order = [];        // per-question shuffled option index arrays
+let current = 0;
+let answered = false;
+let results = [];      // {correct: bool, pickedIdx: original index}
+const LETTERS = ["A","B","C","D"];
+
+const $ = id => document.getElementById(id);
+
+function shuffleAll() {
+  order = QUESTIONS.map(() => {
+    const idx = [0,1,2,3];
+    for (let i = idx.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [idx[i], idx[j]] = [idx[j], idx[i]];
+    }
+    return idx;
+  });
+}
+
+function start() {
+  shuffleAll();
+  current = 0;
+  results = [];
+  $("startScreen").classList.add("hidden");
+  $("resultsScreen").classList.add("hidden");
+  $("quizScreen").classList.remove("hidden");
+  $("counter").style.visibility = "visible";
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = QUESTIONS[current];
+  const cardEl = $("quizScreen");
+  cardEl.classList.remove("fade-in");
+  void cardEl.offsetWidth;
+  cardEl.classList.add("fade-in");
+  $("sectionLabel").textContent = SECTIONS[q.s];
+  $("qNumber").textContent = "Question " + (current + 1) + " of " + QUESTIONS.length;
+  $("counter").textContent = "Question " + (current + 1) + " of " + QUESTIONS.length;
+  $("qStem").textContent = q.q;
+  $("progressFill").style.width = ((current) / QUESTIONS.length * 100) + "%";
+
+  const box = $("options");
+  box.innerHTML = "";
+  order[current].forEach((origIdx, pos) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.dataset.orig = origIdx;
+    btn.innerHTML = '<span class="opt-letter">' + LETTERS[pos] + '</span>'
+      + '<span class="opt-text"></span>'
+      + '<span class="opt-indicator"></span>';
+    btn.querySelector(".opt-text").textContent = q.opts[origIdx];
+    btn.addEventListener("click", () => answer(btn, origIdx));
+    box.appendChild(btn);
+  });
+
+  $("feedback").classList.remove("visible");
+  $("feedbackBackdrop").classList.remove("visible");
+  $("nextMini").classList.remove("visible");
+  const nextLabel = current === QUESTIONS.length - 1 ? "See results" : "Next question";
+  $("nextBtn").textContent = nextLabel;
+  $("nextMini").textContent = nextLabel;
+  window.scrollTo({ top: 0 });
+}
+
+function answer(btn, origIdx) {
+  if (answered) return;
+  answered = true;
+  const q = QUESTIONS[current];
+  const correct = origIdx === q.a;
+  results.push({ correct: correct, pickedIdx: origIdx });
+
+  document.querySelectorAll(".option-btn").forEach(b => {
+    b.disabled = true;
+    const o = Number(b.dataset.orig);
+    if (o === q.a) {
+      b.classList.add("correct");
+      b.querySelector(".opt-indicator").textContent = "✓";
+    } else if (b === btn) {
+      b.classList.add("incorrect");
+      b.querySelector(".opt-indicator").textContent = "✕";
+    } else {
+      b.classList.add("dimmed");
+    }
+  });
+
+  const v = $("verdict");
+  v.textContent = correct ? "Correct" : "Not quite";
+  v.className = "verdict " + (correct ? "good" : "bad");
+  $("rationale").textContent = q.r;
+  const icon = $("verdictIcon");
+  icon.textContent = correct ? "\u2713" : "\u2715";
+  icon.className = "verdict-icon " + (correct ? "good" : "bad");
+  $("feedback").classList.add("visible");
+  $("feedbackBackdrop").classList.add("visible");
+  $("progressFill").style.width = ((current + 1) / QUESTIONS.length * 100) + "%";
+}
+
+function next() {
+  if (current === QUESTIONS.length - 1) { showResults(); return; }
+  current++;
+  renderQuestion();
+}
+
+function showResults() {
+  $("quizScreen").classList.add("hidden");
+  $("feedback").classList.remove("visible");
+  $("feedbackBackdrop").classList.remove("visible");
+  $("nextMini").classList.remove("visible");
+  const cardEl = $("resultsScreen");
+  cardEl.classList.remove("hidden");
+  cardEl.classList.remove("fade-in");
+  void cardEl.offsetWidth;
+  cardEl.classList.add("fade-in");
+  $("counter").style.visibility = "hidden";
+  $("progressFill").style.width = "100%";
+
+  const score = results.filter(r => r.correct).length;
+  $("scoreBig").textContent = score + " / " + QUESTIONS.length;
+  $("scorePct").textContent = Math.round(score / QUESTIONS.length * 100) + "% correct";
+  const band = BANDS.find(b => score >= b.min);
+  $("scoreBand").textContent = band.label;
+  $("scoreNote").textContent = band.note;
+
+  // section breakdown with bars
+  const perSection = SECTIONS.map(() => ({ right: 0, total: 0 }));
+  QUESTIONS.forEach((q, i) => {
+    perSection[q.s].total++;
+    if (results[i] && results[i].correct) perSection[q.s].right++;
+  });
+  const list = $("breakdownList");
+  list.innerHTML = "";
+  let totalMisses = 0;
+  perSection.forEach((sec, i) => {
+    const pct = sec.right / sec.total;
+    const cls = pct >= 0.85 ? "strong" : (pct < 0.6 ? "weak" : "");
+    const missIdx = [];
+    QUESTIONS.forEach((q, qi) => {
+      if (q.s === i && results[qi] && !results[qi].correct) missIdx.push(qi);
+    });
+    totalMisses += missIdx.length;
+    const rowHtml = '<div class="b-name"></div>'
+      + '<div class="b-miss-hint">' + (missIdx.length ? missIdx.length + ' to review' : '') + '</div>'
+      + '<div class="b-score ' + cls + '">' + sec.right + ' / ' + sec.total + '</div>'
+      + '<div class="b-track"><div class="b-fill ' + cls + '" style="width:' + Math.round(pct * 100) + '%"></div></div>';
+    if (!missIdx.length) {
+      const row = document.createElement("div");
+      row.className = "b-row";
+      row.innerHTML = rowHtml;
+      row.querySelector(".b-name").textContent = SECTIONS[i];
+      list.appendChild(row);
+      return;
+    }
+    const group = document.createElement("details");
+    group.className = "b-group";
+    const sum = document.createElement("summary");
+    sum.className = "b-row";
+    sum.innerHTML = rowHtml;
+    sum.querySelector(".b-name").textContent = SECTIONS[i];
+    group.appendChild(sum);
+    const body = document.createElement("div");
+    body.className = "b-group-body";
+    missIdx.forEach(qi => {
+      const q = QUESTIONS[qi];
+      const d = document.createElement("details");
+      d.className = "review-item";
+      d.innerHTML = '<summary><span class="miss-q">Q' + (qi + 1) + '</span><span class="miss-text"></span><span class="chev">›</span></summary>'
+        + '<div class="review-body">'
+        + '<div class="rq"></div>'
+        + '<div class="ra yours">Your answer: <span></span></div>'
+        + '<div class="ra right">Best answer: <span></span></div>'
+        + '<div class="rr"></div></div>';
+      d.querySelector(".miss-text").textContent = q.q.length > 90 ? q.q.slice(0, 90) + "…" : q.q;
+      d.querySelector(".rq").textContent = q.q;
+      d.querySelector(".ra.yours span").textContent = q.opts[results[qi].pickedIdx];
+      d.querySelector(".ra.right span").textContent = q.opts[q.a];
+      d.querySelector(".rr").textContent = q.r;
+      body.appendChild(d);
+    });
+    group.appendChild(body);
+    list.appendChild(group);
+  });
+  $("reviewHint").style.display = totalMisses ? "block" : "none";
+  window.scrollTo({ top: 0 });
+}
+
+// ---------- events ----------
+$("startBtn").addEventListener("click", start);
+$("nextBtn").addEventListener("click", next);
+$("restartBtn").addEventListener("click", start);
+
+function dismissFeedback() {
+  $("feedback").classList.remove("visible");
+  $("feedbackBackdrop").classList.remove("visible");
+  $("nextMini").classList.add("visible");
+}
+$("feedbackBackdrop").addEventListener("click", dismissFeedback);
+$("reviewAnswersBtn").addEventListener("click", dismissFeedback);
+$("nextMini").addEventListener("click", next);
+
+document.addEventListener("keydown", e => {
+  if (!$("quizScreen").classList.contains("hidden")) {
+    const map = { "a":0, "b":1, "c":2, "d":3, "1":0, "2":1, "3":2, "4":3 };
+    const k = e.key.toLowerCase();
+    if (!answered && k in map) {
+      const btn = document.querySelectorAll(".option-btn")[map[k]];
+      if (btn) btn.click();
+    } else if (answered && e.key === "Enter") {
+      next();
+    }
+  } else if (!$("startScreen").classList.contains("hidden") && e.key === "Enter") {
+    start();
+  }
+});
+</script>
+</body>
+</html>

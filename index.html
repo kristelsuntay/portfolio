@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kristel Suntay — Performance Consultant & Instructional Designer</title>
+  <meta name="description" content="Performance consultant, instructional designer, and AI systems builder." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --white:   #FFFFFF;
+      --off:     #F7F7F5;
+      --border:  #E6E6E2;
+      --muted:   #8A8A8A;
+      --ink:     #111111;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Nunito Sans', system-ui, sans-serif;
+      background: var(--white);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── Intro overlay ───────────────────────────────────────── */
+    #intro {
+      position: fixed; inset: 0; z-index: 1000;
+      background: var(--ink);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.5rem;
+      transition: opacity 0.6s ease;
+    }
+    #intro.fade-out { opacity: 0; pointer-events: none; }
+    #intro.gone { display: none; }
+
+    .intro-greeting {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      position: relative; z-index: 1;
+    }
+    .intro-greeting.show { opacity: 1; transform: translateY(0); }
+
+    .intro-name-big {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: clamp(5rem, 18vw, 12rem);
+      color: #fff;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      position: relative; z-index: 1;
+      transform-origin: center center;
+      white-space: nowrap;
+    }
+    .intro-name-big.show { opacity: 1; transform: translateY(0); }
+    .intro-name-big.fly {
+      transition: transform 0.85s ease-out, opacity 0.3s ease 0.65s !important;
+    }
+
+    .intro-fullname {
+      font-size: clamp(0.75rem, 1.4vw, 0.95rem);
+      font-weight: 400;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.06em;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      position: relative; z-index: 1;
+      margin-top: 0.1rem;
+    }
+    .intro-fullname.show { opacity: 1; }
+
+    .intro-sub {
+      font-size: clamp(0.65rem, 1vw, 0.75rem);
+      font-weight: 400; letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      opacity: 0; transition: opacity 0.5s ease;
+      position: relative; z-index: 1;
+      margin-top: 0.5rem;
+    }
+    .intro-sub.show { opacity: 1; }
+
+    /* ── Nav ─────────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem clamp(1.25rem, 4vw, 3rem);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem;
+      opacity: 0; transform: translateY(-8px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    nav.show { opacity: 1; transform: translateY(0); }
+
+    .nav-logo {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1;
+      visibility: hidden;
+    }
+    .nav-logo.show { visibility: visible; }
+
+    .nav-right { display: flex; align-items: center; gap: 1.75rem; }
+    .nav-avail {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      font-size: 0.75rem; font-weight: 500; color: var(--muted);
+    }
+    .avail-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #22C55E; flex-shrink: 0;
+    }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-link {
+      font-size: 0.82rem; font-weight: 500; color: var(--muted);
+      text-decoration: none; transition: color 0.15s;
+      background: none; border: none; cursor: pointer; font-family: inherit;
+    }
+    .nav-link:hover { color: var(--ink); }
+    .nav-cta {
+      font-size: 0.8rem; font-weight: 600;
+      background: var(--ink); color: #fff;
+      padding: 0.5rem 1.1rem; border-radius: 6px;
+      letter-spacing: 0.02em; text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.75; }
+
+    /* ── Profile + Services ──────────────────────────────────── */
+    #profile {
+      padding: 2.5rem clamp(1.25rem, 4vw, 3rem) 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .profile-top {
+      display: flex; align-items: center; gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .profile-photo {
+      width: 72px; height: 72px; flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--off);
+      border: 1px dashed var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.2rem;
+    }
+    .profile-photo svg { opacity: 0.3; }
+    .profile-photo-label {
+      font-size: 0.45rem; color: var(--muted);
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .profile-identity { display: flex; flex-direction: column; gap: 0.2rem; }
+    .profile-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.5rem; color: var(--ink); letter-spacing: 0.02em;
+    }
+    .profile-role { font-size: 0.8rem; color: #555; line-height: 1.5; }
+
+    .profile-services {
+      display: flex; align-items: stretch;
+      border-top: 1px solid var(--border);
+    }
+    .service-item {
+      flex: 1; padding: 1.5rem 1.5rem 1.5rem 0;
+      position: relative;
+    }
+    .service-item:not(:first-child) { padding-left: 1.5rem; }
+    .service-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 1px; background: var(--border);
+    }
+    .service-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem; color: var(--ink);
+      letter-spacing: 0.02em; margin-bottom: 0.3rem;
+    }
+    .service-desc { font-size: 0.76rem; color: #555; line-height: 1.65; }
+
+    /* ── Carousel ────────────────────────────────────────────── */
+    #carousel {
+      padding: 1.5rem 0 3rem;
+      overflow: hidden;
+      position: relative;
+    }
+    #carousel::before,
+    #carousel::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 80px; z-index: 10;
+      pointer-events: none;
+    }
+    #carousel::before { left: 0; background: linear-gradient(to right, var(--white), transparent); }
+    #carousel::after  { right: 0; background: linear-gradient(to left, var(--white), transparent); }
+
+    .carousel-track {
+      display: flex; gap: 1.25rem;
+      width: max-content;
+      will-change: transform;
+    }
+
+    .carousel-card {
+      width: 360px; flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .carousel-card:hover {
+      border-color: var(--muted);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    #carousel { cursor: default; }
+    #carousel.zone-left  { cursor: w-resize; }
+    #carousel.zone-right { cursor: e-resize; }
+    .carousel-thumb { height: 210px; overflow: hidden; }
+    .carousel-footer {
+      padding: 0.9rem 1.1rem;
+      display: flex; flex-direction: column; gap: 0.35rem;
+      border-top: 1px solid var(--off);
+    }
+    .carousel-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85rem; color: var(--ink); line-height: 1.3;
+    }
+    .carousel-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+    /* ── Work section ────────────────────────────────────────── */
+    #work {
+      padding: 2rem clamp(1.25rem, 4vw, 3rem) 4rem;
+      border-top: 1px solid var(--border);
+    }
+    .work-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+    }
+    .work-heading {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.3rem; color: var(--ink);
+    }
+    .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .chip {
+      font-size: 0.72rem; font-weight: 500;
+      padding: 0.28rem 0.75rem; border-radius: 5px;
+      border: 1px solid var(--border); color: var(--muted);
+      background: transparent; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chip:hover { border-color: var(--muted); color: var(--ink); }
+    .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    .cases {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+      gap: 1.25rem;
+    }
+    .case {
+      border: 1px solid var(--border); border-radius: 10px;
+      overflow: hidden; display: flex; flex-direction: column;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .case:hover {
+      border-color: var(--muted);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    }
+    .case-thumb { height: 200px; overflow: hidden; }
+    .case-body { padding: 1.1rem 1.25rem; display: flex; flex-direction: column; gap: 0.6rem; flex: 1; }
+    .case-num {
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    }
+    .case-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem; color: var(--ink); line-height: 1.3;
+    }
+    .case-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .tag {
+      font-size: 0.65rem; font-weight: 500;
+      background: var(--off); color: var(--muted);
+      padding: 0.18rem 0.55rem; border-radius: 4px;
+    }
+    .tag-p { background: var(--ink); color: #fff; }
+    .case-outcome {
+      font-size: 0.8rem; color: var(--muted); line-height: 1.65;
+      border-top: 1px solid var(--off); padding-top: 0.65rem; margin-top: auto;
+    }
+    .case-outcome strong { color: var(--ink); font-weight: 600; }
+
+    /* ── Thumbnails ──────────────────────────────────────────── */
+    .thumb-cert { background: #0C0C0C; display: flex; flex-direction: column; padding: 1.1rem 1.3rem; gap: 0.55rem; height: 100%; }
+    .t-badge { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 4px; padding: 0.14rem 0.55rem; align-self: flex-start; font-size: 0.42rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+    .t-badge::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #22C55E; }
+    .t-score { font-family: 'Poppins', sans-serif; font-size: 2rem; color: #fff; line-height: 1; }
+    .t-score span { font-size: 0.85rem; color: rgba(255,255,255,0.3); font-family: 'Nunito Sans', sans-serif; }
+    .t-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden; }
+    .t-bar-fill { height: 100%; border-radius: 2px; background: rgba(255,255,255,0.7); }
+    .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; margin-top: auto; }
+    .t-cell { background: rgba(255,255,255,0.04); border-radius: 4px; padding: 0.35rem 0.45rem; }
+    .t-cell-label { font-size: 0.35rem; color: rgba(255,255,255,0.3); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.12rem; }
+    .t-cell-val { font-size: 0.56rem; color: rgba(255,255,255,0.8); font-weight: 600; }
+
+    .thumb-portal { background: #F4F5F7; display: flex; flex-direction: column; height: 100%; }
+    .t-chrome { background: #E8E9EC; padding: 0.38rem 0.55rem; display: flex; align-items: center; gap: 0.3rem; border-bottom: 1px solid #D4D5D8; }
+    .t-chrome-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .t-url { flex: 1; background: #fff; border-radius: 2px; padding: 0.13rem 0.38rem; font-size: 0.36rem; color: #888; font-family: monospace; }
+    .t-content { flex: 1; display: flex; gap: 0.45rem; padding: 0.55rem; }
+    .t-sidebar { width: 26%; background: #fff; border-radius: 3px; border: 1px solid #E0E1E4; padding: 0.35rem; display: flex; flex-direction: column; gap: 0.22rem; }
+    .t-sidebar-item { height: 4px; background: #E8E9EC; border-radius: 2px; }
+    .t-sidebar-item.active { background: var(--ink); width: 60%; }
+    .t-main { flex: 1; display: flex; flex-direction: column; gap: 0.3rem; }
+    .t-card { background: #fff; border-radius: 3px; border: 1px solid #E0E1E4; padding: 0.45rem; }
+    .t-card-title { height: 4px; background: var(--ink); border-radius: 2px; width: 55%; margin-bottom: 0.22rem; }
+    .t-card-line { height: 3px; background: #E8E9EC; border-radius: 2px; margin-bottom: 0.13rem; }
+    .t-card-line.short { width: 40%; }
+    .t-tag-row { display: flex; gap: 0.18rem; margin-top: 0.22rem; }
+    .t-mini-tag { height: 4px; width: 18%; background: #E0E0E0; border-radius: 2px; }
+
+    .thumb-scorm { background: #FAFAFA; display: flex; flex-direction: column; height: 100%; }
+    .ts-header { background: var(--ink); padding: 0.45rem 0.7rem; display: flex; align-items: center; justify-content: space-between; }
+    .ts-title { font-size: 0.42rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; text-transform: uppercase; }
+    .ts-progress { display: flex; gap: 0.18rem; }
+    .ts-pip { width: 7px; height: 3px; border-radius: 1px; background: rgba(255,255,255,0.2); }
+    .ts-pip.done { background: rgba(255,255,255,0.6); }
+    .ts-pip.active { background: #fff; }
+    .ts-body { flex: 1; display: grid; grid-template-columns: 1fr 1fr; }
+    .ts-text { padding: 0.55rem 0.7rem; display: flex; flex-direction: column; gap: 0.28rem; }
+    .ts-step { font-size: 0.42rem; color: var(--muted); font-weight: 700; }
+    .ts-h { height: 5px; background: var(--ink); border-radius: 2px; width: 80%; }
+    .ts-line { height: 3px; background: #E0E0E8; border-radius: 2px; }
+    .ts-line.s { width: 65%; }
+    .ts-img { background: var(--off); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--muted); }
+
+    .thumb-chat { background: #0C0C0C; padding: 0.7rem; display: flex; flex-direction: column; gap: 0.35rem; height: 100%; }
+    .tc-header { display: flex; align-items: center; gap: 0.32rem; padding-bottom: 0.35rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .tc-avatar { width: 13px; height: 13px; border-radius: 50%; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+    .tc-name { font-size: 0.42rem; color: rgba(255,255,255,0.7); font-weight: 600; }
+    .tc-status { font-size: 0.35rem; color: #22C55E; }
+    .tc-bubble { border-radius: 6px; padding: 0.3rem 0.45rem; max-width: 78%; font-size: 0.36rem; line-height: 1.5; }
+    .tc-bubble.them { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.75); }
+    .tc-bubble.me { background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.9); align-self: flex-end; }
+    .tc-feedback { margin-top: auto; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 0.3rem 0.45rem; font-size: 0.35rem; color: rgba(255,255,255,0.4); }
+    .tc-feedback strong { color: rgba(255,255,255,0.7); }
+
+    .case-link { text-decoration: none; color: inherit; }
+    .thumb-quiz { background: var(--white); padding: 0.8rem 0.95rem; display: flex; flex-direction: column; gap: 0.32rem; height: 100%; }
+    .tq-chip { align-self: flex-start; font-size: 0.38rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--off); border-radius: 3px; padding: 0.14rem 0.42rem; margin-bottom: 0.1rem; }
+    .tq-stem { height: 5px; background: var(--ink); border-radius: 2px; width: 85%; }
+    .tq-stem.s2 { width: 58%; margin-bottom: 0.18rem; }
+    .tq-opt { display: flex; align-items: center; gap: 0.35rem; border: 1px solid var(--border); border-radius: 4px; padding: 0.3rem 0.42rem; }
+    .tq-opt.right { border-color: #22C55E; background: #F0FDF4; }
+    .tq-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.28rem; color: #fff; }
+    .tq-opt.right .tq-dot { background: #22C55E; border-color: #22C55E; }
+    .tq-line { height: 3px; background: #E8E9EC; border-radius: 2px; flex: 1; }
+    .tq-opt.right .tq-line { background: #BBE7C9; }
+    .tq-note { margin-top: auto; background: var(--off); border-radius: 4px; padding: 0.32rem 0.45rem; font-size: 0.36rem; color: var(--muted); line-height: 1.55; }
+    .tq-note strong { color: var(--ink); }
+
+    /* ── CV Drawer ───────────────────────────────────────────── */
+    #drawer-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.35);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    #drawer-overlay.show { opacity: 1; pointer-events: all; }
+
+    #cv-drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+      width: min(460px, 100vw);
+      background: var(--white);
+      border-left: 1px solid var(--border);
+      transform: translateX(100%);
+      transition: transform 0.4s ease-out;
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+    #cv-drawer.show { transform: translateX(0); }
+
+    .drawer-header {
+      padding: 1.5rem 1.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; justify-content: space-between;
+      position: sticky; top: 0; background: var(--white); z-index: 1;
+    }
+    .drawer-close {
+      background: none; border: 1px solid var(--border); cursor: pointer;
+      width: 30px; height: 30px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 0.9rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .drawer-close:hover { border-color: var(--muted); color: var(--ink); }
+
+    .drawer-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.5rem; color: var(--ink); letter-spacing: 0.03em;
+    }
+    .drawer-role { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+
+    .drawer-body { padding: 1.75rem; flex: 1; display: flex; flex-direction: column; gap: 2rem; }
+
+    .cv-section-label {
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--muted); margin-bottom: 0.9rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .cv-bio { font-size: 0.875rem; color: var(--muted); line-height: 1.75; }
+    .cv-bio strong { color: var(--ink); font-weight: 600; }
+
+    .cv-exp-item { margin-bottom: 1.25rem; }
+    .cv-exp-item:last-child { margin-bottom: 0; }
+    .cv-exp-role { font-weight: 600; font-size: 0.875rem; color: var(--ink); }
+    .cv-exp-company { font-size: 0.8rem; color: var(--muted); }
+    .cv-exp-date { font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; opacity: 0.6; }
+    .cv-exp-points { margin-top: 0.5rem; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 0.3rem; }
+    .cv-exp-points li { font-size: 0.8rem; color: var(--muted); line-height: 1.6; padding-left: 1rem; position: relative; }
+    .cv-exp-points li::before { content: '–'; position: absolute; left: 0; color: var(--border); }
+
+    .cv-skills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .cv-skill {
+      font-size: 0.72rem; font-weight: 500;
+      padding: 0.28rem 0.7rem; border-radius: 5px;
+      background: var(--off); color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .cv-skill.dark { background: var(--ink); color: #fff; border-color: transparent; }
+
+    .drawer-footer {
+      padding: 1.25rem 1.75rem;
+      border-top: 1px solid var(--border);
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+    }
+    .btn-main {
+      display: inline-flex; align-items: center;
+      background: var(--ink); color: #fff;
+      font-size: 0.82rem; font-weight: 600;
+      padding: 0.65rem 1.3rem; border-radius: 6px;
+      text-decoration: none; white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .btn-main:hover { opacity: 0.75; }
+    .btn-outline {
+      display: inline-flex; align-items: center;
+      border: 1px solid var(--border); color: var(--muted);
+      font-size: 0.82rem; font-weight: 500;
+      padding: 0.65rem 1.3rem; border-radius: 6px;
+      text-decoration: none; white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      padding: 1.5rem clamp(1.25rem, 4vw, 3rem);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.75rem;
+    }
+    .footer-name { font-family: 'Poppins', sans-serif; font-size: 0.9rem; letter-spacing: 0.08em; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-link { font-size: 0.75rem; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .footer-link:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+
+  <!-- INTRO -->
+  <div id="intro">
+    <p class="intro-greeting">hey there, welcome to my page.</p>
+    <h1 class="intro-name-big">KS</h1>
+    <p class="intro-fullname">Kristel Suntay</p>
+    <p class="intro-sub">Performance Consultant &nbsp;·&nbsp; Instructional Designer &nbsp;·&nbsp; AI Systems</p>
+  </div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <span class="nav-logo" id="nav-logo">KS</span>
+    <div class="nav-right">
+      <div class="nav-avail">
+        <span class="avail-dot"></span>
+        Available for work
+      </div>
+      <div class="nav-links">
+        <a href="#work" class="nav-link">Work</a>
+        <button class="nav-link" onclick="openDrawer()">CV</button>
+      </div>
+      <a href="https://www.upwork.com/freelancers/kristelsuntay" class="nav-cta" target="_blank" rel="noopener">Hire me</a>
+    </div>
+  </nav>
+
+  <!-- PROFILE + SERVICES -->
+  <section id="profile">
+    <div class="profile-top">
+      <div class="profile-photo">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="13" r="7" fill="#111"/>
+          <path d="M4 32c0-7.732 6.268-14 14-14s14 6.268 14 14" stroke="#111" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="profile-photo-label">Photo</span>
+      </div>
+      <div class="profile-identity">
+        <div class="profile-name">Kristel Suntay</div>
+        <div class="profile-role">Performance Consultant &nbsp;·&nbsp; Instructional Designer &nbsp;·&nbsp; AI Learning Systems</div>
+      </div>
+    </div>
+    <div class="profile-services">
+      <div class="service-item">
+        <div class="service-name">Performance Consulting</div>
+        <div class="service-desc">Find out what's behind a performance gap and match it to the right solution, whether that's training, a process fix, or something else entirely.</div>
+      </div>
+      <div class="service-item">
+        <div class="service-name">Instructional Design</div>
+        <div class="service-desc">Design and develop effective training, using instructional methods matched to the gap, the learner, and the context.</div>
+      </div>
+      <div class="service-item">
+        <div class="service-name">AI Learning Systems</div>
+        <div class="service-desc">Design AI-powered learning solutions tailored to your workflow, simulations, automated evaluations, or tools that reduce manual L&D work.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAROUSEL -->
+  <section id="carousel">
+    <div class="carousel-track" id="carousel-track">
+
+      <div class="carousel-card">
+        <div class="carousel-thumb"><div class="thumb-cert" style="height:100%;"><div class="t-badge">AI Assessment</div><div class="t-score">87<span>/100</span></div><div class="t-bar"><div class="t-bar-fill" style="width:87%;"></div></div><div class="t-grid"><div class="t-cell"><div class="t-cell-label">Pass rate</div><div class="t-cell-val">91%</div></div><div class="t-cell"><div class="t-cell-label">Review time</div><div class="t-cell-val">down 60%</div></div></div></div></div>
+        <div class="carousel-footer"><div class="carousel-title">AI-Powered Certification System</div><div class="carousel-tags"><span class="tag tag-p">AI Systems</span><span class="tag">Automation</span></div></div>
+      </div>
+
+      <div class="carousel-card">
+        <div class="carousel-thumb"><div class="thumb-portal" style="height:100%;"><div class="t-chrome"><div class="t-chrome-dot" style="background:#FF5F57;"></div><div class="t-chrome-dot" style="background:#FFBD2E;"></div><div class="t-chrome-dot" style="background:#28C840;"></div><div class="t-url">support-tools.internal / cases / CAS-00482</div></div><div class="t-content"><div class="t-sidebar"><div class="t-sidebar-item active"></div><div class="t-sidebar-item"></div><div class="t-sidebar-item"></div><div class="t-sidebar-item" style="width:45%;"></div></div><div class="t-main"><div class="t-card"><div class="t-card-title"></div><div class="t-card-line"></div><div class="t-card-line short"></div><div class="t-tag-row"><div class="t-mini-tag"></div><div class="t-mini-tag"></div></div></div><div class="t-card"><div class="t-card-line"></div><div class="t-card-line short"></div></div></div></div></div></div>
+        <div class="carousel-footer"><div class="carousel-title">Browser-Based Tool Simulation</div><div class="carousel-tags"><span class="tag tag-p">Simulation</span><span class="tag">SCORM</span></div></div>
+      </div>
+
+      <div class="carousel-card">
+        <div class="carousel-thumb"><div class="thumb-scorm" style="height:100%;"><div class="ts-header"><span class="ts-title">Module 3 — AI Search Tools</span><div class="ts-progress"><div class="ts-pip done"></div><div class="ts-pip done"></div><div class="ts-pip active"></div><div class="ts-pip"></div><div class="ts-pip"></div></div></div><div class="ts-body"><div class="ts-text"><span class="ts-step">Step 03</span><div class="ts-h"></div><div style="height:0.18rem;"></div><div class="ts-line"></div><div class="ts-line"></div><div class="ts-line s"></div><div style="height:0.25rem;"></div><div class="ts-line"></div><div class="ts-line s"></div></div><div class="ts-img">◎</div></div></div></div>
+        <div class="carousel-footer"><div class="carousel-title">AI Tool Adoption Program</div><div class="carousel-tags"><span class="tag tag-p">Knowledge Management</span><span class="tag">SCORM</span></div></div>
+      </div>
+
+      <div class="carousel-card">
+        <div class="carousel-thumb"><div class="thumb-chat" style="height:100%;"><div class="tc-header"><div class="tc-avatar"></div><div><div class="tc-name">Customer Simulator — Alex</div><div class="tc-status">● Scenario active</div></div></div><div class="tc-bubble them">Hi, I've been waiting 3 days for a refund.</div><div class="tc-bubble me">I understand. Let me pull up your account right now.</div><div class="tc-bubble them">Can you actually do that?</div><div class="tc-feedback"><strong>Feedback:</strong> Good empathy opener. Check policy before promising timeline.</div></div></div>
+        <div class="carousel-footer"><div class="carousel-title">AI Customer Simulator</div><div class="carousel-tags"><span class="tag tag-p">AI Systems</span><span class="tag">Simulation</span></div></div>
+      </div>
+
+      <!-- Duplicates for infinite loop -->
+      <div class="carousel-card"><div class="carousel-thumb"><div class="thumb-cert" style="height:100%;"><div class="t-badge">AI Assessment</div><div class="t-score">87<span>/100</span></div><div class="t-bar"><div class="t-bar-fill" style="width:87%;"></div></div><div class="t-grid"><div class="t-cell"><div class="t-cell-label">Pass rate</div><div class="t-cell-val">91%</div></div><div class="t-cell"><div class="t-cell-label">Review time</div><div class="t-cell-val">down 60%</div></div></div></div></div><div class="carousel-footer"><div class="carousel-title">AI-Powered Certification System</div><div class="carousel-tags"><span class="tag tag-p">AI Systems</span><span class="tag">Automation</span></div></div></div>
+      <div class="carousel-card"><div class="carousel-thumb"><div class="thumb-portal" style="height:100%;"><div class="t-chrome"><div class="t-chrome-dot" style="background:#FF5F57;"></div><div class="t-chrome-dot" style="background:#FFBD2E;"></div><div class="t-chrome-dot" style="background:#28C840;"></div><div class="t-url">support-tools.internal / cases / CAS-00482</div></div><div class="t-content"><div class="t-sidebar"><div class="t-sidebar-item active"></div><div class="t-sidebar-item"></div><div class="t-sidebar-item"></div></div><div class="t-main"><div class="t-card"><div class="t-card-title"></div><div class="t-card-line"></div><div class="t-card-line short"></div></div><div class="t-card"><div class="t-card-line"></div></div></div></div></div></div><div class="carousel-footer"><div class="carousel-title">Browser-Based Tool Simulation</div><div class="carousel-tags"><span class="tag tag-p">Simulation</span><span class="tag">SCORM</span></div></div></div>
+      <div class="carousel-card"><div class="carousel-thumb"><div class="thumb-scorm" style="height:100%;"><div class="ts-header"><span class="ts-title">Module 3 — AI Search Tools</span><div class="ts-progress"><div class="ts-pip done"></div><div class="ts-pip done"></div><div class="ts-pip active"></div><div class="ts-pip"></div></div></div><div class="ts-body"><div class="ts-text"><span class="ts-step">Step 03</span><div class="ts-h"></div><div class="ts-line"></div><div class="ts-line s"></div></div><div class="ts-img">◎</div></div></div></div><div class="carousel-footer"><div class="carousel-title">AI Tool Adoption Program</div><div class="carousel-tags"><span class="tag tag-p">Knowledge Management</span></div></div></div>
+      <div class="carousel-card"><div class="carousel-thumb"><div class="thumb-chat" style="height:100%;"><div class="tc-header"><div class="tc-avatar"></div><div><div class="tc-name">Customer Simulator — Alex</div><div class="tc-status">● Scenario active</div></div></div><div class="tc-bubble them">Hi, I've been waiting 3 days for a refund.</div><div class="tc-bubble me">I understand. Let me pull up your account.</div><div class="tc-feedback"><strong>Feedback:</strong> Good empathy opener.</div></div></div><div class="carousel-footer"><div class="carousel-title">AI Customer Simulator</div><div class="carousel-tags"><span class="tag tag-p">AI Systems</span><span class="tag">Simulation</span></div></div></div>
+
+    </div>
+  </section>
+
+  <!-- WORK GRID -->
+  <section id="work">
+    <div class="work-header">
+      <h2 class="work-heading">All Work</h2>
+      <div class="filters">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="ai">AI Systems</button>
+        <button class="chip" data-filter="id">Instructional Design</button>
+        <button class="chip" data-filter="perf">Performance</button>
+      </div>
+    </div>
+    <div class="cases">
+      <div class="case" data-tags="ai perf">
+        <div class="case-thumb"><div class="thumb-cert" style="height:100%;"><div class="t-badge">AI Assessment</div><div class="t-score">87<span>/100</span></div><div class="t-bar"><div class="t-bar-fill" style="width:87%;"></div></div><div class="t-grid"><div class="t-cell"><div class="t-cell-label">Submitted</div><div class="t-cell-val">247 cases</div></div><div class="t-cell"><div class="t-cell-label">Pass rate</div><div class="t-cell-val">91%</div></div><div class="t-cell"><div class="t-cell-label">Coach queue</div><div class="t-cell-val">12 pending</div></div><div class="t-cell"><div class="t-cell-label">Review time</div><div class="t-cell-val">down 60%</div></div></div></div></div>
+        <div class="case-body"><div class="case-num">01 — AI Systems · Performance</div><div class="case-title">AI-Powered Certification System for a Global Support Team</div><div class="case-tags"><span class="tag tag-p">AI Systems</span><span class="tag">Automation</span><span class="tag">n8n</span><span class="tag">800+ specialists</span></div><div class="case-outcome"><strong>Coach review time down 60%.</strong> LLM-scored assessments with automated coach queues and Slack integration.</div></div>
+      </div>
+      <div class="case" data-tags="id">
+        <div class="case-thumb"><div class="thumb-portal" style="height:100%;"><div class="t-chrome"><div class="t-chrome-dot" style="background:#FF5F57;"></div><div class="t-chrome-dot" style="background:#FFBD2E;"></div><div class="t-chrome-dot" style="background:#28C840;"></div><div class="t-url">support-tools.internal / cases / CAS-00482</div></div><div class="t-content"><div class="t-sidebar"><div class="t-sidebar-item active"></div><div class="t-sidebar-item"></div><div class="t-sidebar-item"></div><div class="t-sidebar-item"></div></div><div class="t-main"><div class="t-card"><div class="t-card-title"></div><div class="t-card-line"></div><div class="t-card-line short"></div><div class="t-tag-row"><div class="t-mini-tag"></div><div class="t-mini-tag"></div></div></div><div class="t-card"><div class="t-card-line"></div><div class="t-card-line short"></div></div></div></div></div></div>
+        <div class="case-body"><div class="case-num">02 — Instructional Design · Simulation</div><div class="case-title">Browser-Based Tool Simulation for Specialist Onboarding</div><div class="case-tags"><span class="tag tag-p">Simulation</span><span class="tag">SCORM</span><span class="tag">HTML/CSS/JS</span></div><div class="case-outcome"><strong>Zero live-environment risk during onboarding.</strong> Fully interactive portal sim with branching feedback.</div></div>
+      </div>
+      <div class="case" data-tags="id perf">
+        <div class="case-thumb"><div class="thumb-scorm" style="height:100%;"><div class="ts-header"><span class="ts-title">Module 3 — AI Search Tools</span><div class="ts-progress"><div class="ts-pip done"></div><div class="ts-pip done"></div><div class="ts-pip active"></div><div class="ts-pip"></div><div class="ts-pip"></div></div></div><div class="ts-body"><div class="ts-text"><span class="ts-step">Step 03</span><div class="ts-h"></div><div style="height:0.18rem;"></div><div class="ts-line"></div><div class="ts-line"></div><div class="ts-line s"></div><div style="height:0.25rem;"></div><div class="ts-line"></div><div class="ts-line s"></div></div><div class="ts-img">◎</div></div></div></div>
+        <div class="case-body"><div class="case-num">03 — Knowledge Management · SCORM</div><div class="case-title">AI Tool Adoption Program for Support Operations</div><div class="case-tags"><span class="tag tag-p">Knowledge Management</span><span class="tag">SCORM</span><span class="tag">Process Design</span></div><div class="case-outcome"><strong>Measurable adoption increase post-rollout.</strong> Closed the mental model gap, not just awareness.</div></div>
+      </div>
+      <div class="case" data-tags="ai id">
+        <div class="case-thumb"><div class="thumb-chat" style="height:100%;"><div class="tc-header"><div class="tc-avatar"></div><div><div class="tc-name">Customer Simulator — Alex</div><div class="tc-status">● Training scenario active</div></div></div><div class="tc-bubble them">Hi, I've been waiting 3 days for a refund and nobody has helped me.</div><div class="tc-bubble me">I understand how frustrating that must be. Let me pull up your account right now.</div><div class="tc-bubble them">Can you actually do that?</div><div class="tc-feedback"><strong>Feedback:</strong> Good empathy opener. Check policy before promising timeline.</div></div></div>
+        <div class="case-body"><div class="case-num">04 — AI Systems · Simulation</div><div class="case-title">AI Customer Simulator for Conversation Quality Training</div><div class="case-tags"><span class="tag tag-p">AI Systems</span><span class="tag">Prompt Engineering</span><span class="tag">Simulation</span></div><div class="case-outcome"><strong>Validated in 2 weeks.</strong> Adaptive AI roleplay with structured feedback. Scaled as live role-play alternative.</div></div>
+      </div>
+      <a class="case case-link" data-tags="id perf" href="assessment.html">
+        <div class="case-thumb"><div class="thumb-quiz" style="height:100%;">
+          <div class="tq-chip">Q24 · Learning Science</div>
+          <div class="tq-stem"></div><div class="tq-stem s2"></div>
+          <div class="tq-opt"><div class="tq-dot"></div><div class="tq-line"></div></div>
+          <div class="tq-opt right"><div class="tq-dot">✓</div><div class="tq-line"></div></div>
+          <div class="tq-opt"><div class="tq-dot"></div><div class="tq-line" style="flex:0 0 70%;"></div></div>
+          <div class="tq-note"><strong>Why:</strong> Effortful retrieval beats fluent re-reading on delayed tests of new cases.</div>
+        </div></div>
+        <div class="case-body"><div class="case-num">05 · Assessment Design · Interactive</div><div class="case-title">L&amp;D Practice Assessment: 65 Scenario Items You Can Take Live</div><div class="case-tags"><span class="tag tag-p">Assessment Design</span><span class="tag">Item Writing</span><span class="tag">HTML/CSS/JS</span></div><div class="case-outcome"><strong>Take it live.</strong> Scenario items with misconception-built distractors, instant rationales, and a per-domain diagnostic.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- CV DRAWER -->
+  <div id="drawer-overlay" onclick="closeDrawer()"></div>
+  <aside id="cv-drawer">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-name">Kristel Suntay</div>
+        <div class="drawer-role">Performance Consultant · Instructional Designer · AI Systems Builder</div>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div>
+        <div class="cv-section-label">About</div>
+        <p class="cv-bio">I design training that helps people do their jobs. I bring in AI where it makes sense, and build systems with it that make the work faster and the output better.</p>
+      </div>
+      <div>
+        <div class="cv-section-label">Experience</div>
+        <div class="cv-exp-item">
+          <div class="cv-exp-role">Learning Program Manager</div>
+          <div class="cv-exp-company">Canva · Customer Service Learning</div>
+          <div class="cv-exp-date">May 2024 — Present</div>
+          <ul class="cv-exp-points">
+            <li>Run needs analysis to diagnose whether training is the right fix before anything gets built</li>
+            <li>Design and develop training for Core Product Support teams across billing and technical support, from new feature readiness to broader capability building</li>
+            <li>Use AI across the production workflow to draft and proofread content, evaluate quality, and build full courses, scaling output without lowering the bar</li>
+            <li>Approve and quality-check BPO training initiatives for alignment to business goals, stepping in when partner training falls short</li>
+            <li>Evaluate impact against support metrics, and reinforce learning through coach training so behaviors stick</li>
+          </ul>
+        </div>
+        <div class="cv-exp-item">
+          <div class="cv-exp-role">Senior Instructional Designer</div>
+          <div class="cv-exp-company">Alorica</div>
+          <div class="cv-exp-date">Feb 2021 — May 2024</div>
+          <ul class="cv-exp-points">
+            <li>Scoped new and prospective client work by reviewing their curriculum, running front-end analysis, and pitching proposals with tailored training offerings</li>
+            <li>Led training projects end to end, estimating timelines and mapping deliverables, then keeping the instructional and graphic designers aligned, on track, and delivering to quality</li>
+            <li>Partnered with SMEs to turn raw expertise into usable content, built interactive e-learning in Storyline and Rise, and mentored incoming designers</li>
+          </ul>
+        </div>
+        <div class="cv-exp-item">
+          <div class="cv-exp-role">Learning &amp; Development Specialist</div>
+          <div class="cv-exp-company">Collection House</div>
+          <div class="cv-exp-date">Dec 2018 — Feb 2021</div>
+          <ul class="cv-exp-points">
+            <li>Analyzed performance data to surface training needs, then designed programs to address them</li>
+            <li>Built interactive e-learning and facilitated live training sessions</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="cv-section-label">Frameworks</div>
+        <div class="cv-skills">
+          <span class="cv-skill dark">Action Mapping</span>
+          <span class="cv-skill dark">ADDIE / SAM</span>
+          <span class="cv-skill">Merrill's Performance-Content Matrix</span>
+          <span class="cv-skill">Kirkpatrick Evaluation</span>
+          <span class="cv-skill">Mayer's Multimedia Principles</span>
+        </div>
+      </div>
+      <div>
+        <div class="cv-section-label">Tools &amp; Stack</div>
+        <div class="cv-skills">
+          <span class="cv-skill dark">Claude Code</span>
+          <span class="cv-skill dark">Claude Cowork</span>
+          <span class="cv-skill dark">n8n</span>
+          <span class="cv-skill">Workato</span>
+          <span class="cv-skill">Codex</span>
+          <span class="cv-skill">Google Apps Script</span>
+          <span class="cv-skill">Articulate Storyline</span>
+          <span class="cv-skill">Articulate Rise</span>
+          <span class="cv-skill">Canva</span>
+          <span class="cv-skill">Google Workspace</span>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <a href="https://www.upwork.com/freelancers/kristelsuntay" class="btn-main" target="_blank" rel="noopener">Hire me on Upwork</a>
+      <a href="mailto:hello@kristelsuntay.com" class="btn-outline">hello@kristelsuntay.com</a>
+    </div>
+  </aside>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-name">KS</span>
+    <div class="footer-links">
+      <a href="mailto:hello@kristelsuntay.com" class="footer-link">hello@kristelsuntay.com</a>
+      <a href="https://www.upwork.com/freelancers/kristelsuntay" class="footer-link" target="_blank" rel="noopener">Upwork</a>
+      <span class="footer-link">kristelsuntay.com</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── Intro ────────────────────────────────────────────────
+    const intro      = document.getElementById('intro');
+    const greeting   = document.querySelector('.intro-greeting');
+    const introName  = document.querySelector('.intro-name-big');
+    const introFull  = document.querySelector('.intro-fullname');
+    const introSub   = document.querySelector('.intro-sub');
+    const navEl      = document.getElementById('nav');
+    const navLogo    = document.getElementById('nav-logo');
+
+    function runIntro() {
+      setTimeout(() => { greeting.classList.add('show'); }, 120);
+      setTimeout(() => {
+        introName.classList.add('show');
+        introFull.classList.add('show');
+        introSub.classList.add('show');
+      }, 500);
+
+      setTimeout(() => {
+        const from = introName.getBoundingClientRect();
+        const to   = navLogo.getBoundingClientRect();
+        const dx   = (to.left + to.width / 2) - (from.left + from.width / 2);
+        const dy   = (to.top  + to.height / 2) - (from.top  + from.height / 2);
+        const sc   = to.height / from.height;
+
+        introName.classList.add('fly');
+        introName.style.transform = `translate(${dx}px, ${dy}px) scale(${sc})`;
+        introName.style.opacity   = '0';
+      }, 2000);
+
+      setTimeout(() => {
+        navEl.classList.add('show');
+        navLogo.classList.add('show');
+        intro.classList.add('fade-out');
+        setTimeout(() => intro.classList.add('gone'), 700);
+      }, 2700);
+    }
+
+    runIntro();
+
+    // ── Drawer ───────────────────────────────────────────────
+    function openDrawer() {
+      document.getElementById('cv-drawer').classList.add('show');
+      document.getElementById('drawer-overlay').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+      document.getElementById('cv-drawer').classList.remove('show');
+      document.getElementById('drawer-overlay').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+    // ── Carousel cursor scroll ───────────────────────────────
+    const carouselEl = document.getElementById('carousel');
+    const track      = document.getElementById('carousel-track');
+
+    let pos        = 0;
+    let speed      = 0;
+    let isHovering = false;
+    const BASE     = 0.7;
+
+    function getHalfWidth() { return track.scrollWidth / 2; }
+
+    carouselEl.addEventListener('mouseenter', () => { isHovering = true; });
+    carouselEl.addEventListener('mouseleave', () => {
+      isHovering = false;
+      speed = BASE;
+      carouselEl.classList.remove('zone-left', 'zone-right');
+    });
+
+    carouselEl.addEventListener('mousemove', e => {
+      const rect = carouselEl.getBoundingClientRect();
+      const pct  = (e.clientX - rect.left) / rect.width;
+
+      if (pct < 0.3) {
+        speed = -(BASE + ((0.3 - pct) / 0.3) * 2.5);
+        carouselEl.classList.add('zone-left');
+        carouselEl.classList.remove('zone-right');
+      } else if (pct > 0.7) {
+        speed = BASE + ((pct - 0.7) / 0.3) * 2.5;
+        carouselEl.classList.add('zone-right');
+        carouselEl.classList.remove('zone-left');
+      } else {
+        speed = 0;
+        carouselEl.classList.remove('zone-left', 'zone-right');
+      }
+    });
+
+    function tick() {
+      if (!isHovering) speed = BASE;
+      pos -= speed;
+      const half = getHalfWidth();
+      if (pos <= -half) pos += half;
+      if (pos > 0)      pos -= half;
+      track.style.transform = `translateX(${pos}px)`;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    // ── Filters ──────────────────────────────────────────────
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const f = chip.dataset.filter;
+        document.querySelectorAll('.case').forEach(card => {
+          card.style.display = (f === 'all' || (card.dataset.tags || '').includes(f)) ? '' : 'none';
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
