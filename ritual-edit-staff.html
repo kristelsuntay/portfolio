@@ -610,6 +610,12 @@ const todayISO = () => { const d=new Date(); return new Date(d.getTime()-d.getTi
 const todaySheet = () => { const d=new Date(); return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`; };
 const longDate = iso => { if(!iso) return ""; const [y,m,d]=iso.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}); };
 const shortDate = d => d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+/* Delivery date (column I): the day the customer wants to receive the order. An order is due on the earliest date among its items not served yet. */
+function deliverBy(xs){ const ds = xs.filter(x => !x.cur.served && !isShip(x)).map(x => parseSheetDate(x.cur.deliv)).filter(Boolean); return ds.length ? new Date(Math.min(...ds)) : null; }
+function dueLabel(d){
+  if(!d) return null; const t = new Date(); t.setHours(0,0,0,0); const n = Math.round((d - t)/864e5);
+  return { n, urgent: n <= 0, text: n < 0 ? `Overdue ${-n} day${n===-1?"":"s"}` : n === 0 ? "Due today" : n === 1 ? "Due tomorrow" : `Due ${d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}` };
+}
 function parseSheetDate(s){
   const m = String(s||"").trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
   if(!m) return null;
@@ -689,8 +695,8 @@ function orderGroups(includeDeleted){
     const ds = lv.map(x=>parseSheetDate(x.cur.date)).filter(Boolean);
     const first = ds.length ? new Date(Math.min(...ds)) : null, last = ds.length ? new Date(Math.max(...ds)) : null;
     const status = !lv.length ? "deleted" : due <= 0.005 ? "paid" : due < total - 0.005 ? "part" : "unpaid";
-    const toServe = lv.some(x => !x.cur.served && !isShip(x));
-    return { ...g, total, due, first, last, status, toServe, methods:[...new Set(lv.map(x=>x.cur.method).filter(Boolean))] };
+    const toServe = lv.some(x => !x.cur.served && !isShip(x)), dueBy = deliverBy(lv);
+    return { ...g, total, due, first, last, status, toServe, dueBy, methods:[...new Set(lv.map(x=>x.cur.method).filter(Boolean))] };
   }).sort((a,b)=> (b.last?.getTime()||0)-(a.last?.getTime()||0) || noNum(b.no)-noNum(a.no));
 }
 
@@ -709,6 +715,9 @@ function issues(){
       else if(Math.abs(num(x.F) - lineOf(c)) > 0.01) out.push({ x, why:`TOTAL in the sheet is ${money(num(x.F))}, not ${money(lineOf(c))}. If it was a freebie, set a discount instead.` });
     }
     if(!c.no) out.push({ x, why:"No order number" });
+    const dv = parseSheetDate(c.deliv);
+    if(dv && d && dv < d) out.push({ x, why:`Delivery date (${c.deliv}) is before the order date (${c.date})` });
+    if(dv && !c.served && !isShip(x) && dv < new Date(now.getFullYear(), now.getMonth(), now.getDate())) out.push({ x, why:`Delivery was due ${shortDate(dv)} and it hasn't been served`, follow:true });
     if(products.length && !isShip(x) && !prod.has(nameKey(c.item))) out.push({ x, why:"Item isn't in the Products list" });
     if(!isPaid(c) && d){ const days = Math.floor((now - d)/864e5); if(days > 14) out.push({ x, why:`Unpaid for ${days} days`, follow:true }); }
     const k = [orderKey(c), nameKey(c.item), num(c.price)].join("|");
@@ -838,7 +847,7 @@ function renderLog(){
         <button type="button" class="omain" data-order="${esc(g.key)}" aria-label="Edit order ${esc(g.no||"")} for ${esc(g.cust)}">
           <span class="who">${esc(g.cust||"No name")}</span>
           <span class="amt">${money(g.total)}</span>
-          <span class="meta">${g.no?`<b>${esc(g.no)}</b> · `:""}${g.first?shortDate(g.first):"No date"}${g.last && g.first && g.last.getTime()!==g.first.getTime()?"–"+shortDate(g.last):""} · ${n} item${n===1?"":"s"}</span>
+          <span class="meta">${g.no?`<b>${esc(g.no)}</b> · `:""}${g.first?shortDate(g.first):"No date"}${g.last && g.first && g.last.getTime()!==g.first.getTime()?"–"+shortDate(g.last):""} · ${n} item${n===1?"":"s"}${g.toServe && g.dueBy ? ` · <b>${esc(dueLabel(g.dueBy).text)}</b>` : ""}</span>
           <span class="st">${statusPills(g)}</span>
         </button>
         <button type="button" class="chevbtn" data-toggle="${esc(g.key)}" aria-expanded="${isOpen}" aria-label="${isOpen?"Hide":"Show"} items">${CHEV}</button>
@@ -872,7 +881,7 @@ $("olist").addEventListener("click", e => {
   const g = orderGroups(true).find(g => g.key === key); if(!g) return;
   const first = g.rows.find(x=>!x.deleted) || g.rows[0];
   if(b.dataset.order) openOrder(g);
-  else if(b.dataset.add) openRow(null, { date:first.cur.date, cust:first.cur.cust, no:first.cur.no, method:first.cur.method, status:first.cur.status });
+  else if(b.dataset.add) openRow(null, { date:first.cur.date, cust:first.cur.cust, no:first.cur.no, method:first.cur.method, status:first.cur.status, deliv:first.cur.deliv });
   else if(b.dataset.serve) markServed(g);
   else if(b.dataset.mergepick) openMergePicker(g);
   else if(b.dataset.mergeKey){ const m = mergeSuggestions().find(m => m.keep.key===key || m.fold.key===key); if(m) mergeInto(m.keep, m.fold); }
@@ -896,6 +905,7 @@ function openOrder(g){
     body: `<div class="formgrid">
       <label class="f">Customer<input id="oCust" list="dlOCust" value="${esc(first.cur.cust)}"></label>
       <label class="f">Order date<input id="oDate" type="date" value="${toISO(first.cur.date)}"></label>
+      <label class="f full">Delivery date (the day the customer wants it)<input id="oDeliv" type="date" value="${toISO(lv.find(x=>x.cur.deliv)?.cur.deliv || "")}"></label>
       <div class="full step"><div class="slbl">Payment${st.pay===null?" <span>Mixed: some items paid</span>":""}</div><div class="chips" id="oPay"><button type="button" class="chip" data-pay="">Unpaid</button>${m.map(v=>`<button type="button" class="chip" data-pay="${esc(v)}">Paid · ${esc(v)}</button>`).join("")}</div></div>
       <div class="full step"><div class="slbl">Served${st.served===null?" <span>Mixed</span>":""}</div><div class="chips" id="oServe"><button type="button" class="chip" data-s="">Not yet</button><button type="button" class="chip" data-s="1">Served</button></div></div>
       <div class="full step"><div class="slbl">Items <button type="button" class="link" id="oAdd">+ Add item</button></div><div class="olines" id="oLines">
@@ -915,12 +925,12 @@ function openOrder(g){
     </div>`,
     ok: "Save",
     onOk: () => {
-      const cust = $("oCust").value.trim(), date = fromISO($("oDate").value), no = $("oNo").value.trim();
+      const cust = $("oCust").value.trim(), date = fromISO($("oDate").value), no = $("oNo").value.trim(), deliv = fromISO($("oDeliv").value);
       if(!cust){ $("mMsg").className = "msg err"; $("mMsg").textContent = "Add the customer's name."; return; }
       lv.forEach(x => {
         const line = $("oLines").querySelector(`[data-id="${x.id}"]`);
         if(st.gone.has(x.id)){ if(x.orig) x.deleted = true; else rows = rows.filter(r=>r!==x); return; }
-        x.cur.cust = cust; if(date) x.cur.date = date; x.cur.no = no;
+        x.cur.cust = cust; if(date) x.cur.date = date; x.cur.no = no; x.cur.deliv = deliv;
         x.cur.qty = parseFloat(line.querySelector('[data-k="qty"]').value)||0; x.cur.price = parseFloat(line.querySelector('[data-k="price"]').value)||0;
         const sc = line.querySelector('[data-k="scent"]');
         if(sc && sc.value.trim()){ const sp = splitItem(x.cur.item); if(nameKey(sc.value) !== nameKey(sp.scent)) x.cur.item = [sp.cat, titleCase(sc.value.trim()), sp.size].filter(Boolean).join(" - "); }
@@ -960,7 +970,7 @@ function openOrder(g){
     if(b.dataset.rm){ st.gone.has(l.dataset.id) ? st.gone.delete(l.dataset.id) : st.gone.add(l.dataset.id); }
     draw();
   });
-  $("oAdd").addEventListener("click", () => { closeModal(true); setTimeout(() => openRow(null, { date:first.cur.date, cust:first.cur.cust, no:first.cur.no, method:first.cur.method, status:first.cur.status }), 220); });
+  $("oAdd").addEventListener("click", () => { closeModal(true); setTimeout(() => openRow(null, { date:first.cur.date, cust:first.cur.cust, no:first.cur.no, method:first.cur.method, status:first.cur.status, deliv:first.cur.deliv }), 220); });
   draw();
 }
 
@@ -997,6 +1007,7 @@ function rowForm(c, isNew){
     <div class="full" style="margin-top:-6px"><button type="button" class="link" id="customToggle">Not in the list? Type it in</button></div>
     <div class="f">Qty<div class="stepper"><button type="button" id="qMinus" aria-label="Less">−</button><input id="eQty" type="number" min="0" step="1" inputmode="numeric" value="${fmtNum(c.qty)||1}" aria-label="Quantity"><button type="button" id="qPlus" aria-label="More">+</button></div></div>
     <label class="f">Price each<input id="ePrice" type="number" min="0" step="0.01" inputmode="decimal" value="${fmtNum(c.price)}"></label>
+    <label class="f full">Delivery date (the day the customer wants it)<input id="eDeliv" type="date" value="${toISO(c.deliv)}"></label>
     <div class="full step"><div class="slbl">Payment</div><div class="chips" id="payChips">
       <button type="button" class="chip" data-pay="">Unpaid</button>${METHODS.concat(c.method && !METHODS.includes(c.method) ? [c.method] : []).map(m=>`<button type="button" class="chip" data-pay="${esc(m)}">Paid · ${esc(m)}</button>`).join("")}</div></div>
     <div class="full step"><div class="slbl">Served</div><div class="chips" id="serveChips"><button type="button" class="chip" data-s="">Not yet</button><button type="button" class="chip" data-s="1">Served</button></div></div>
@@ -1099,7 +1110,7 @@ function readForm(x){
   c.date = fromISO($("eDate").value) || c.date || todaySheet(); c.cust = $("eCust").value.trim(); c.item = formItem();
   c.price = parseFloat($("ePrice").value)||0; c.qty = parseFloat($("eQty").value)||0;
   const d = $("eDisc").value; c.disc = d === "" ? (x.orig && x.orig.disc !== "" ? 0 : "") : parseFloat(d)||0;
-  c.no = $("eNo").value.trim(); c.served = fromISO($("eServed").value);
+  c.no = $("eNo").value.trim(); c.served = fromISO($("eServed").value); c.deliv = fromISO($("eDeliv").value);
   if(form.paid) c.method = form.method;
   setStatus(x, form.paid);
   if(form.paid) c.paid = fromISO($("ePaidDate").value) || c.paid;
@@ -1116,7 +1127,7 @@ function openRow(id, preset){
     let row = x;
     if(isNew){ row = { id:"n"+(++newSeq), r:null, orig:null, cur:{ ...base }, F:"", deleted:false }; rows.push(row); }
     readForm(row);
-    const keep = { date:row.cur.date, cust:row.cur.cust, method:row.cur.method, no:row.cur.no, status:row.cur.status };
+    const keep = { date:row.cur.date, cust:row.cur.cust, method:row.cur.method, no:row.cur.no, status:row.cur.status, deliv:row.cur.deliv };
     if(!mcp){ closeModal(); changed(true); toast("Kept on this page. Open it in claude.ai to save to the sheet."); if(again) setTimeout(()=>openRow(null, keep), 220); return; }
     const ok = await commit();
     if(!ok) changed(true);
@@ -1324,7 +1335,7 @@ $("addItem").addEventListener("click", () => {
   const m = meta(); if(!m) return;
   if(blank){ m.items.push({title:"",sub:"",qty:1,price:0,paid:false,pct:0}); fillEditor(); renderPaper(); return; }
   const first = selRows().find(x=>!isShip(x));
-  openRow(null, { date:first?.cur.date || todaySheet(), cust:first?.cur.cust || m.bill, no:first?.cur.no || "", method:first?.cur.method || "" });
+  openRow(null, { date:first?.cur.date || todaySheet(), cust:first?.cur.cust || m.bill, no:first?.cur.no || "", method:first?.cur.method || "", deliv:first?.cur.deliv || "" });
 });
 $("newBtn").addEventListener("click", () => { blank = "blank:" + Date.now(); selIds = new Set(); renderOrders(); fillEditor(); renderPaper(); $("fBill").focus(); });
 [["fDate","date"],["fBill","bill"],["fBill2","bill2"],["fPayBy","payBy"]].forEach(([id,k]) =>
@@ -1404,9 +1415,10 @@ function drawPaper(){
   const status = t.total <= 0 ? "" : t.due <= 0.005 ? `<span class="ok">Paid in full</span>` : t.paid > 0 ? `Balance due ${money(t.due)}${payBy}` : `Awaiting payment${payBy}`;
   const delivs = blank ? [] : selRows().map(x=>parseSheetDate(x.cur.served)).filter(Boolean).sort((a,b)=>a-b);
   const deliv = delivs.length ? delivs[delivs.length-1].toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) : "";
+  const dueBy = blank ? null : deliverBy(selRows());
   const cell = (l, v, v2) => v ? `<div><div class="p-lbl">${l}</div><div class="v">${v}</div>${v2?`<div class="v2">${esc(v2)}</div>`:""}</div>` : "";
   const head = `<div class="p-head"><div class="p-brand">THE RITUAL EDIT</div><div class="p-title">Order Summary</div></div>
-    <div class="p-info">${cell("Customer", esc(m.bill), m.bill2)}${cell("Order date", esc(longDate(m.date)))}${cell("Order no.", esc(no))}${cell("Delivered", esc(deliv))}${cell("Status", status)}</div>`;
+    <div class="p-info">${cell("Customer", esc(m.bill), m.bill2)}${cell("Order date", esc(longDate(m.date)))}${cell("Order no.", esc(no))}${deliv ? cell("Delivered", esc(deliv)) : dueBy ? cell("Delivery date", esc(dueBy.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}))) : ""}${cell("Status", status)}</div>`;
   const contHead = `<div class="p-cont"><span class="p-brand">THE RITUAL EDIT</span><span>Order Summary${no?" "+esc(no):""} · continued</span></div>`;
   const thead = `<colgroup><col><col style="width:64px"><col style="width:110px"><col style="width:110px"></colgroup>
     <thead><tr><th>Item</th><th class="q">Qty</th><th class="n">Price</th><th class="n">Amount</th></tr></thead>`;
@@ -1491,7 +1503,7 @@ $("pngBtn").addEventListener("click", e => { if(!meta()) return toast("Pick an o
 $("copyBtn").addEventListener("click", async () => {
   const m = meta(); if(!m) return toast("Pick an order first.");
   const t = totals();
-  const text = [`THE RITUAL EDIT — Order Summary ${invNo()}`.trim(), `Customer: ${m.bill}`, `Order date: ${longDate(m.date)}`, "",
+  const text = [`THE RITUAL EDIT — Order Summary ${invNo()}`.trim(), `Customer: ${m.bill}`, `Order date: ${longDate(m.date)}`, ...(() => { const d = blank ? null : deliverBy(selRows()); return d ? [`Delivery date: ${d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})}`] : []; })(), "",
     ...invItems().map(it=>`${it.title}${it.sub?` (${it.sub})`:""} — ${it.qty} × ${money(it.price)} = ${money(it.qty*it.price - (it.disc||0))}${it.paid?" (paid)":""}`), "",
     ...(t.disc ? [`Discount: −${money(t.disc)}`] : []), ...(t.ship ? [`Shipping: ${money(t.ship)}`] : []),
     `Total: ${money(t.total)}`, ...(t.paid ? [`Paid: ${money(t.paid)}`, `Balance due: ${money(Math.max(0,t.due))}`] : []), "", settings.pay].join("\n");
@@ -1768,7 +1780,7 @@ const Pack = (() => {
   const tickKey = (g,x) => g.key + "|" + x.r + "|" + nameKey(x.cur.item);
   const daysSince = d => d ? Math.max(0, Math.floor((new Date().setHours(0,0,0,0) - d.getTime())/864e5)) : null;
   const COPY = {
-    pack:["Packing","Oldest orders first. Tick each item as it goes in the bag, then mark the order served."],
+    pack:["Packing","Soonest delivery date first. Tick each item as it goes in the bag, then mark the order served."],
     collect:["To collect","Served orders that still owe money. Mark payment received once it's in GCash, BPI or your hand."],
     done:["Done today","Orders served today. If one was marked by mistake, undo it here."]
   };
@@ -1782,21 +1794,24 @@ const Pack = (() => {
       const ds = g.rows.map(x => parseSheetDate(x.cur.date)).filter(Boolean);
       const first = ds.length ? new Date(Math.min(...ds)) : null;
       const unpaidRows = g.rows.filter(x => !isPaid(x.cur));
-      return { ...g, goods, first, unpaidRows, due: unpaidRows.reduce((s,x)=>s+netOf(x.cur),0),
+      return { ...g, goods, first, unpaidRows, dueBy: deliverBy(g.rows), due: unpaidRows.reduce((s,x)=>s+netOf(x.cur),0),
         methods:[...new Set(g.rows.map(x=>x.cur.method).filter(Boolean))],
         toServe: goods.some(x => !x.cur.served),
         doneToday: goods.length > 0 && goods.every(x => x.cur.served) && goods.some(x => sameDate(x.cur.served, today)) };
     });
   }
   const byAge = (a,b) => (a.first?.getTime()??0) - (b.first?.getTime()??0) || noNum(a.no) - noNum(b.no);
+  /* Packing order: soonest delivery date first, then orders without one, oldest first. */
+  const byDue = (a,b) => ((a.dueBy ? a.dueBy.getTime() : Infinity) - (b.dueBy ? b.dueBy.getTime() : Infinity)) || byAge(a,b);
 
   function head(g){
     const n = daysSince(g.first);
-    const age = sub === "done" ? "Served today" : n === null ? "No order date" : n === 0 ? "Ordered today" : n === 1 ? "Waiting 1 day" : `Waiting ${n} days`;
+    const dl = sub === "pack" ? dueLabel(g.dueBy) : null;
+    const age = sub === "done" ? "Served today" : dl ? dl.text : n === null ? "No order date" : n === 0 ? "Ordered today" : n === 1 ? "Waiting 1 day" : `Waiting ${n} days`;
     const pay = !g.unpaidRows.length ? `<span class="badge paid">${ICON.check}Paid${g.methods.length?" · "+esc(g.methods.join(" / ")):""}</span>`
       : `<span class="badge unpaid">${ICON.ring}Collect</span><span class="collect">${money(g.due)}</span>`;
     return `<div class="pk-head"><span class="who">${esc(g.cust||"No name")}</span>
-      <span class="meta">${g.no?`<b>${esc(g.no)}</b> · `:""}${g.first?shortDate(g.first)+" · ":""}<span class="age ${sub!=="done"&&n>=5?"old":""}">${age}</span></span>
+      <span class="meta">${g.no?`<b>${esc(g.no)}</b> · `:""}${g.first?shortDate(g.first)+" · ":""}<span class="age ${dl ? (dl.urgent ? "old" : "") : sub!=="done"&&n>=5?"old":""}">${age}</span></span>
       <span class="pay">${pay}</span></div>`;
   }
 
@@ -1809,7 +1824,7 @@ const Pack = (() => {
       return;
     }
     const all = groups();
-    const lists = { pack: all.filter(g => g.toServe).sort(byAge), collect: all.filter(g => g.unpaidRows.length && !g.toServe).sort(byAge), done: all.filter(g => g.doneToday) };
+    const lists = { pack: all.filter(g => g.toServe).sort(byDue), collect: all.filter(g => g.unpaidRows.length && !g.toServe).sort(byAge), done: all.filter(g => g.doneToday) };
     $("pkNPack").textContent = lists.pack.length; $("pkNCollect").textContent = lists.collect.length; $("pkNDone").textContent = lists.done.length;
     const q = $("pkSearch").value.trim().toLowerCase();
     const list = lists[sub].filter(g => !q || [g.no, g.cust, ...g.rows.map(x=>x.cur.item)].join(" ").toLowerCase().includes(q));
