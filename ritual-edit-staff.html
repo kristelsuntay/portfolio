@@ -333,6 +333,8 @@ table.rnt td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
 .cart-totals .grand{align-items:baseline;margin-top:4px}
 .cart-totals .grand strong{font-family:var(--font-display);font-weight:400;font-size:24px;color:var(--ink)}
 #cartRoot .chip small{margin-left:6px}
+.cart-added{font-size:13px;font-weight:500;color:var(--ink);background:var(--accent-soft);border-radius:8px;padding:8px 10px;animation:fadeUp .25s var(--ease)}
+.modal footer .msg.cart-count{color:var(--ink);font-weight:600}
 /* ===== PACKING (shared with staff) ===== */
 .pk-tabs{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:3px}
 .pk-tabs button{flex:1;border:none;border-radius:8px;padding:9px 8px;background:none;color:var(--muted);font-weight:500;display:flex;gap:7px;justify-content:center;align-items:center}
@@ -1797,6 +1799,8 @@ function openCart(preset){
   function addLine(item, price, n = 1){
     const l = st.lines.find(l => nameKey(l.item) === nameKey(item) && l.price === price);
     if(l) l.qty += n; else st.lines.push({ item, price, qty:n });
+    const it = parseItem(item), q = (l || st.lines[st.lines.length-1]).qty;
+    st.flash = `Added ${it.title}${it.sub?" "+it.sub:""} · ${q} in this order. Tap another scent or product to keep adding.`;
   }
   const sub = () => st.lines.reduce((s,l) => s + l.qty*l.price, 0);
   const discAmt = () => { const v = parseFloat(st.discV)||0, s = sub(); return Math.min(s, st.discT === "pct" ? s*Math.min(100,v)/100 : v); };
@@ -1815,6 +1819,7 @@ function openCart(preset){
         + `<button type="button" class="chip" data-scent="__other" aria-pressed="${st.other}">+ Other scent</button>`;
       $("cOtherRow").hidden = !st.other;
     }
+    $("cAdded").textContent = st.flash || ""; $("cAdded").hidden = !st.flash;
   }
   function drawLines(){
     $("cLines").innerHTML = st.lines.map((l,i) => { const it = parseItem(l.item); return `<div class="oline" data-i="${i}"><div class="nm"><div class="t">${esc(it.title)}</div><div class="d">${esc(it.sub||"")}</div></div>
@@ -1828,7 +1833,9 @@ function openCart(preset){
     const d = discAmt(), sh = parseFloat(st.ship)||0, n = st.lines.reduce((s,l)=>s+l.qty,0);
     $("cTotals").innerHTML = `${d||sh?`<div class="crow"><span>Subtotal</span><span>${money(sub())}</span></div>`:""}${d?`<div class="crow"><span>Discount</span><span>−${money(d)}</span></div>`:""}${sh?`<div class="crow"><span>Shipping</span><span>${money(sh)}</span></div>`:""}
       <div class="crow grand"><span>${n} item${n===1?"":"s"}</span><strong>${money(total())}</strong></div>`;
-    $("mOk").textContent = n ? `Review order` : "Review order";
+    /* Running count in the footer, which stays on screen while the list grows below. */
+    $("mMsg").className = "msg cart-count"; $("mMsg").textContent = n ? `${n} item${n===1?"":"s"} in this order · ${money(total())}` : "No items yet";
+    $("mOk").textContent = n ? `Review ${n} item${n===1?"":"s"}` : "Review order";
   }
   function drawPay(){ $("cPay").querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", b.dataset.pay === st.pay)); }
 
@@ -1843,6 +1850,7 @@ function openCart(preset){
         <label class="f">Delivery date<input id="cDeliv" type="date" value="${st.deliv}"></label>
         <div class="full step"><div class="slbl">1 · Product and size</div><div class="chips" id="cProds"></div></div>
         <div class="full step" id="cScentStep" hidden><div class="slbl">2 · Tap a scent to add it. Tap again for one more.</div><div class="chips" id="cScents"></div>
+          <div class="cart-added" id="cAdded" role="status" aria-live="polite" hidden></div>
           <div class="disc" id="cOtherRow" hidden><input id="cOther" placeholder="Type the scent, e.g. Fig & Cedar" autocomplete="off"><span></span><button type="button" id="cOtherAdd">Add</button></div></div>
         <div class="full step" id="cCustomStep" hidden><div class="slbl">Type the item</div>
           <div class="disc"><input id="cCName" placeholder="Category - Scent - Size" autocomplete="off"><input id="cCPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="₱"><button type="button" id="cCAdd">Add</button></div></div>
