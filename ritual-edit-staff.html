@@ -326,6 +326,13 @@ table.rnt td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
 .p-cont span:last-child{font-size:11px;color:var(--p-faint);letter-spacing:.06em}
 .p-pageno{position:absolute;bottom:22px;right:64px;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--p-faint)}
 
+/* ===== NEW ORDER cart ===== */
+.cart-totals{display:flex;flex-direction:column;gap:2px;background:var(--bg);border-radius:10px;padding:12px 14px;font-variant-numeric:tabular-nums}
+.cart-totals .crow{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--muted)}
+.cart-totals .crow span:last-child{color:var(--ink)}
+.cart-totals .grand{align-items:baseline;margin-top:4px}
+.cart-totals .grand strong{font-family:var(--font-display);font-weight:400;font-size:24px;color:var(--ink)}
+#cartRoot .chip small{margin-left:6px}
 /* ===== PACKING (shared with staff) ===== */
 .pk-tabs{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:3px}
 .pk-tabs button{flex:1;border:none;border-radius:8px;padding:9px 8px;background:none;color:var(--muted);font-weight:500;display:flex;gap:7px;justify-content:center;align-items:center}
@@ -881,14 +888,14 @@ $("olist").addEventListener("click", e => {
   const g = orderGroups(true).find(g => g.key === key); if(!g) return;
   const first = g.rows.find(x=>!x.deleted) || g.rows[0];
   if(b.dataset.order) openOrder(g);
-  else if(b.dataset.add) openRow(null, { date:first.cur.date, cust:first.cur.cust, no:first.cur.no, method:first.cur.method, status:first.cur.status, deliv:first.cur.deliv });
+  else if(b.dataset.add) openCart({ date:first.cur.date, cust:first.cur.cust, no:first.cur.no, method:first.cur.method, status:first.cur.status, deliv:first.cur.deliv });
   else if(b.dataset.serve) markServed(g);
   else if(b.dataset.mergepick) openMergePicker(g);
   else if(b.dataset.mergeKey){ const m = mergeSuggestions().find(m => m.keep.key===key || m.fold.key===key); if(m) mergeInto(m.keep, m.fold); }
   else { blank = null; selIds = new Set(g.rows.filter(x=>!x.deleted).map(x=>x.id)); setView("invoice"); }
 });
 ["oSearch","oFilter"].forEach(id => $(id).addEventListener(id==="oSearch"?"input":"change", renderLog));
-$("addRowBtn").addEventListener("click", () => openRow(null));
+$("addRowBtn").addEventListener("click", () => openCart());
 
 /* ---------- whole-order editor ---------- */
 function openOrder(g){
@@ -970,7 +977,7 @@ function openOrder(g){
     if(b.dataset.rm){ st.gone.has(l.dataset.id) ? st.gone.delete(l.dataset.id) : st.gone.add(l.dataset.id); }
     draw();
   });
-  $("oAdd").addEventListener("click", () => { closeModal(true); setTimeout(() => openRow(null, { date:first.cur.date, cust:first.cur.cust, no:first.cur.no, method:first.cur.method, status:first.cur.status, deliv:first.cur.deliv }), 220); });
+  $("oAdd").addEventListener("click", () => { closeModal(true); setTimeout(() => openCart({ date:first.cur.date, cust:first.cur.cust, no:first.cur.no, method:first.cur.method, status:first.cur.status, deliv:first.cur.deliv }), 220); });
   draw();
 }
 
@@ -1335,7 +1342,7 @@ $("addItem").addEventListener("click", () => {
   const m = meta(); if(!m) return;
   if(blank){ m.items.push({title:"",sub:"",qty:1,price:0,paid:false,pct:0}); fillEditor(); renderPaper(); return; }
   const first = selRows().find(x=>!isShip(x));
-  openRow(null, { date:first?.cur.date || todaySheet(), cust:first?.cur.cust || m.bill, no:first?.cur.no || "", method:first?.cur.method || "", deliv:first?.cur.deliv || "" });
+  openCart({ date:first?.cur.date || todaySheet(), cust:first?.cur.cust || m.bill, no:first?.cur.no || "", method:first?.cur.method || "", deliv:first?.cur.deliv || "" });
 });
 $("newBtn").addEventListener("click", () => { blank = "blank:" + Date.now(); selIds = new Set(); renderOrders(); fillEditor(); renderPaper(); $("fBill").focus(); });
 [["fDate","date"],["fBill","bill"],["fBill2","bill2"],["fPayBy","payBy"]].forEach(([id,k]) =>
@@ -1767,6 +1774,167 @@ function noMcp(){
   if(typeof Pack !== "undefined") Pack.render();
 }
 </script>
+<script>
+/* ---------- NEW ORDER (cart) ----------
+   Product + size > tap scents (each tap adds 1) > adjust qty or price > discount, shipping, payment > review > save.
+   Nothing reaches the sheet until "Save order" on the review step, and every line is saved in one go. */
+function openCart(preset){
+  preset = preset || {};
+  const st = { cust: preset.cust || "", date: toISO(preset.date) || todayISO(), deliv: toISO(preset.deliv) || "", prod: null, other: false,
+    lines: [], discV: "", discT: "pct", ship: "", pay: "", custom: false };
+  const cat = catalog();
+  /* One chip per product and size. Its price is the category default for that size when there is one. */
+  const prods = (() => {
+    const m = new Map();
+    cat.forEach(p => { const k = p.cat + "|" + p.size; if(!m.has(k)) m.set(k, { k, cat:p.cat, size:p.size, prices:[] }); m.get(k).prices.push(num(p.price)); });
+    products.map(p => ({ ...p, ...splitItem(p.name) })).filter(p => p.scent === "*" || /^tbd$/i.test(p.scent)).forEach(d => {
+      const k = d.cat + "|" + d.size; if(!m.has(k)) m.set(k, { k, cat:d.cat, size:d.size, prices:[] }); m.get(k).base = num(d.price); });
+    return [...m.values()].map(p => ({ ...p, base: p.base ?? Math.min(...p.prices) }))
+      .sort((a,b) => a.cat.localeCompare(b.cat) || (parseFloat(a.size)||0) - (parseFloat(b.size)||0));
+  })();
+  const scentsFor = p => cat.filter(c => c.cat === p.cat && c.size === p.size && !/^tbd$/i.test(c.scent));
+  const itemName = (p, scent) => [p.cat, scent, p.size].filter(Boolean).join(" - ");
+  function addLine(item, price, n = 1){
+    const l = st.lines.find(l => nameKey(l.item) === nameKey(item) && l.price === price);
+    if(l) l.qty += n; else st.lines.push({ item, price, qty:n });
+  }
+  const sub = () => st.lines.reduce((s,l) => s + l.qty*l.price, 0);
+  const discAmt = () => { const v = parseFloat(st.discV)||0, s = sub(); return Math.min(s, st.discT === "pct" ? s*Math.min(100,v)/100 : v); };
+  const total = () => sub() - discAmt() + (parseFloat(st.ship)||0);
+
+  function drawProds(){
+    $("cProds").innerHTML = prods.map(p => `<button type="button" class="chip" data-prod="${esc(p.k)}" aria-pressed="${st.prod?.k===p.k}">${esc(p.size ? `${p.cat} ${p.size}` : p.cat)}<small>${money(p.base)}</small></button>`).join("")
+      + `<button type="button" class="chip" data-prod="__custom" aria-pressed="${st.custom}">+ Not in the list</button>`;
+    const p = st.prod;
+    $("cScentStep").hidden = !p || st.custom;
+    $("cCustomStep").hidden = !st.custom;
+    if(p && !st.custom){
+      const count = item => st.lines.filter(l => nameKey(l.item) === nameKey(item)).reduce((s,l)=>s+l.qty,0);
+      $("cScents").innerHTML = scentsFor(p).map(c => { const n = count(c.name); return `<button type="button" class="chip" data-scent="${esc(c.scent)}" aria-pressed="${n>0}">${esc(c.scent)}${num(c.price)!==p.base?`<small>${money(c.price)}</small>`:""}${n?`<small>× ${n}</small>`:""}</button>`; }).join("")
+        + `<button type="button" class="chip" data-scent="TBD" aria-pressed="${count(itemName(p,"TBD"))>0}">Not chosen yet${count(itemName(p,"TBD"))?`<small>× ${count(itemName(p,"TBD"))}</small>`:""}</button>`
+        + `<button type="button" class="chip" data-scent="__other" aria-pressed="${st.other}">+ Other scent</button>`;
+      $("cOtherRow").hidden = !st.other;
+    }
+  }
+  function drawLines(){
+    $("cLines").innerHTML = st.lines.map((l,i) => { const it = parseItem(l.item); return `<div class="oline" data-i="${i}"><div class="nm"><div class="t">${esc(it.title)}</div><div class="d">${esc(it.sub||"")}</div></div>
+      <div class="stepper"><button type="button" data-q="-1" aria-label="Less">−</button><input type="number" min="1" step="1" value="${l.qty}" data-k="qty" aria-label="Quantity"><button type="button" data-q="1" aria-label="More">+</button></div>
+      <input type="number" min="0" step="0.01" value="${fmtNum(l.price)}" data-k="price" aria-label="Price each">
+      <button type="button" class="x" data-rm="${i}" aria-label="Remove">×</button></div>`; }).join("")
+      || `<div class="state">Nothing added yet. Pick a product, then tap a scent to add it. Tap again to add another.</div>`;
+    drawTotals();
+  }
+  function drawTotals(){
+    const d = discAmt(), sh = parseFloat(st.ship)||0, n = st.lines.reduce((s,l)=>s+l.qty,0);
+    $("cTotals").innerHTML = `${d||sh?`<div class="crow"><span>Subtotal</span><span>${money(sub())}</span></div>`:""}${d?`<div class="crow"><span>Discount</span><span>−${money(d)}</span></div>`:""}${sh?`<div class="crow"><span>Shipping</span><span>${money(sh)}</span></div>`:""}
+      <div class="crow grand"><span>${n} item${n===1?"":"s"}</span><strong>${money(total())}</strong></div>`;
+    $("mOk").textContent = n ? `Review order` : "Review order";
+  }
+  function drawPay(){ $("cPay").querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", b.dataset.pay === st.pay)); }
+
+  function step1(){
+    const recent = !preset.cust ? recentCustomers() : [];
+    const custs = [...new Set(live().map(x=>x.cur.cust).filter(Boolean))].sort();
+    openModal({ title: preset.no ? `Add to ${preset.no}` : "New order", sub: preset.cust ? preset.cust : "Pick a product, tap scents to add them, then review.",
+      body: `<div class="formgrid" id="cartRoot">
+        ${preset.cust ? "" : `<label class="f full">Customer<input id="cCust" list="dlCCust" value="${esc(st.cust)}" autocomplete="off" placeholder="Type a name or pick one below"></label>
+        ${recent.length ? `<div class="full chips" id="cCustChips">${recent.map(n=>`<button type="button" class="chip" data-v="${esc(n)}" aria-pressed="${nameKey(n)===nameKey(st.cust)}">${esc(n)}</button>`).join("")}</div>` : ""}`}
+        <label class="f">Order date<input id="cDate" type="date" value="${st.date}"></label>
+        <label class="f">Delivery date<input id="cDeliv" type="date" value="${st.deliv}"></label>
+        <div class="full step"><div class="slbl">1 · Product and size</div><div class="chips" id="cProds"></div></div>
+        <div class="full step" id="cScentStep" hidden><div class="slbl">2 · Tap a scent to add it. Tap again for one more.</div><div class="chips" id="cScents"></div>
+          <div class="disc" id="cOtherRow" hidden><input id="cOther" placeholder="Type the scent, e.g. Fig & Cedar" autocomplete="off"><span></span><button type="button" id="cOtherAdd">Add</button></div></div>
+        <div class="full step" id="cCustomStep" hidden><div class="slbl">Type the item</div>
+          <div class="disc"><input id="cCName" placeholder="Category - Scent - Size" autocomplete="off"><input id="cCPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="₱"><button type="button" id="cCAdd">Add</button></div></div>
+        <div class="full step"><div class="slbl">In this order <span>Change qty or price here</span></div><div class="olines" id="cLines"></div></div>
+        <label class="f">Order discount<span class="disc"><input id="cDisc" type="number" min="0" step="0.01" inputmode="decimal" value="${esc(st.discV)}" placeholder="0"><select id="cDiscT" aria-label="Discount type"><option value="pct">%</option><option value="amt">₱</option></select><span></span></span></label>
+        <label class="f">Shipping fee<input id="cShip" type="number" min="0" step="0.01" inputmode="decimal" value="${esc(st.ship)}" placeholder="0"></label>
+        <div class="full step"><div class="slbl">Payment</div><div class="chips" id="cPay"><button type="button" class="chip" data-pay="">Unpaid</button>${METHODS.map(m=>`<button type="button" class="chip" data-pay="${esc(m)}">Paid · ${esc(m)}</button>`).join("")}</div></div>
+        <div class="full cart-totals" id="cTotals"></div>
+        <datalist id="dlCCust">${custs.map(v=>`<option value="${esc(v)}">`).join("")}</datalist>
+      </div>`,
+      ok:"Review order", onOk: review });
+    $("cDiscT").value = st.discT;
+    const root = $("cartRoot");
+    root.addEventListener("click", e => {
+      const b = e.target.closest("button"); if(!b) return;
+      if(b.dataset.v !== undefined && b.closest("#cCustChips")){ st.cust = b.dataset.v; $("cCust").value = st.cust; $("cCustChips").querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed", x===b)); return; }
+      if(b.dataset.prod){ if(b.dataset.prod === "__custom"){ st.custom = !st.custom; st.prod = null; } else { st.custom = false; st.other = false; st.prod = prods.find(p => p.k === b.dataset.prod); } drawProds(); if(st.custom) $("cCName").focus(); return; }
+      if(b.dataset.scent){
+        const p = st.prod; if(!p) return;
+        if(b.dataset.scent === "__other"){ st.other = !st.other; drawProds(); if(st.other) $("cOther").focus(); return; }
+        const sc = b.dataset.scent, own = cat.find(c => c.cat===p.cat && c.size===p.size && c.scent===sc);
+        addLine(itemName(p, sc), own ? num(own.price) : p.base); drawProds(); drawLines(); return;
+      }
+      if(b.id === "cOtherAdd"){ const v = titleCase($("cOther").value.trim()); if(!v){ $("cOther").focus(); return; } addLine(itemName(st.prod, v), st.prod.base); $("cOther").value = ""; drawProds(); drawLines(); return; }
+      if(b.id === "cCAdd"){ const n = $("cCName").value.trim(), pr = parseFloat($("cCPrice").value)||0; if(!n){ $("cCName").focus(); return; } addLine(n, pr); $("cCName").value = ""; $("cCPrice").value = ""; drawLines(); return; }
+      if(b.dataset.q){ const l = st.lines[+b.closest(".oline").dataset.i]; l.qty = Math.max(1, l.qty + (+b.dataset.q)); drawProds(); drawLines(); return; }
+      if(b.dataset.rm !== undefined){ st.lines.splice(+b.dataset.rm, 1); drawProds(); drawLines(); return; }
+      if(b.dataset.pay !== undefined){ st.pay = b.dataset.pay; drawPay(); return; }
+    });
+    root.addEventListener("input", e => {
+      const t = e.target;
+      if(t.id === "cCust") st.cust = t.value;
+      else if(t.id === "cDate") st.date = t.value;
+      else if(t.id === "cDeliv") st.deliv = t.value;
+      else if(t.id === "cDisc"){ st.discV = t.value; drawTotals(); }
+      else if(t.id === "cDiscT"){ st.discT = t.value; drawTotals(); }
+      else if(t.id === "cShip"){ st.ship = t.value; drawTotals(); }
+      else if(t.dataset.k){ const l = st.lines[+t.closest(".oline").dataset.i]; if(t.dataset.k === "qty") l.qty = Math.max(1, parseInt(t.value)||1); else l.price = parseFloat(t.value)||0; drawTotals(); }
+    });
+    root.addEventListener("change", e => { if(e.target.id === "cDiscT"){ st.discT = e.target.value; drawTotals(); } });
+    root.addEventListener("keydown", e => {
+      if(e.key !== "Enter") return;
+      if(e.target.id === "cOther"){ e.preventDefault(); $("cOtherAdd").click(); }
+      if(e.target.id === "cCName" || e.target.id === "cCPrice"){ e.preventDefault(); $("cCAdd").click(); }
+    });
+    drawProds(); drawLines(); drawPay();
+    if(!preset.cust && !st.cust) setTimeout(() => $("cCust")?.focus(), 80);
+  }
+
+  function review(){
+    const cust = (preset.cust || st.cust).trim();
+    const err = !cust ? "Add the customer's name." : !st.lines.length ? "Add at least one item." : "";
+    if(err){ $("mMsg").className = "msg err"; $("mMsg").textContent = err; return; }
+    const d = discAmt(), sh = parseFloat(st.ship)||0;
+    openModal({ title:"Check the order", sub:`${cust}${preset.no?" · "+preset.no:""} · ordered ${longDate(st.date)}${st.deliv?" · deliver "+longDate(st.deliv):""}`,
+      body: `<div class="rnwrap"><table class="rnt"><thead><tr><th>Item</th><th>Qty</th><th style="text-align:right">Amount</th></tr></thead><tbody>
+        ${st.lines.map(l => { const it = parseItem(l.item); return `<tr><td>${esc(it.title)}${it.sub?` <span class="fine">· ${esc(it.sub)}</span>`:""}</td><td>${l.qty} × ${money(l.price)}</td><td style="text-align:right">${money(l.qty*l.price)}</td></tr>`; }).join("")}
+        ${d?`<tr><td colspan="2">Discount${st.discT==="pct"?` (${fmtNum(st.discV)}%)`:""}</td><td style="text-align:right">−${money(d)}</td></tr>`:""}
+        ${sh?`<tr><td colspan="2">Shipping</td><td style="text-align:right">${money(sh)}</td></tr>`:""}
+        </tbody></table></div>
+        <div class="formgrid"><div class="full sum"><span class="fine">${st.pay ? "Paid by " + esc(st.pay) : "Unpaid"}</span><strong>${money(total())}</strong></div></div>`,
+      ok:"Save order", onOk: () => save(cust),
+      alt:{ label:"Back", onClick: () => step1() } });
+  }
+
+  async function save(cust){
+    const date = fromISO(st.date) || todaySheet(), deliv = fromISO(st.deliv);
+    const no = preset.no || numberFor(cust, date);
+    /* The order discount is spread across the lines by value, so each row's DISCOUNT adds up to it exactly. */
+    const s = sub(), d = discAmt(); let left = Math.round(d*100)/100;
+    const made = st.lines.map((l,i) => {
+      const g = l.qty*l.price, share = i === st.lines.length-1 ? left : Math.round((s ? g/s*d : 0)*100)/100; left = Math.round((left - share)*100)/100;
+      return { item:l.item, price:l.price, qty:l.qty, disc: share > 0 ? share : "" };
+    });
+    const sh = parseFloat(st.ship)||0;
+    if(sh > 0) made.push({ item:SHIP_ITEM, price:sh, qty:1, disc:"" });
+    const added = made.map(m => {
+      const x = { id:"n"+(++newSeq), r:null, orig:null, F:"", deleted:false,
+        cur:{ date, cust, item:m.item, price:m.price, qty:m.qty, method:"", status:"", deliv, no, disc:m.disc, paid:"", served:"" } };
+      if(st.pay){ x.cur.method = st.pay; setStatus(x, true); }
+      rows.push(x); return x;
+    });
+    if(!mcp){ closeModal(); changed(true); return toast("Kept on this page. Open it in claude.ai to save to the sheet."); }
+    const ok = await commit();
+    if(!ok){ changed(true); return; }
+    toast(`${no} saved · ${added.length} line${added.length===1?"":"s"}`);
+  }
+
+  step1();
+}
+</script>
+
 <script>
 /* ---------- PACKING ----------
    The fulfilment view. The owner sees it as a tab; anyone who isn't the owner sees only this view.
