@@ -358,6 +358,16 @@
     .tc-feedback strong { color: rgba(255,255,255,0.7); }
 
     .case-link { text-decoration: none; color: inherit; }
+    .thumb-img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }
+    .thumb-sb { height: 100%; background: var(--off); padding: 0.8rem 0.95rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .sb-head { display: flex; justify-content: space-between; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .sb-row { flex: 1; display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.5rem; min-height: 0; }
+    .sb-frame, .sb-notes { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .sb-h { height: 0.55rem; width: 70%; background: var(--ink); border-radius: 2px; margin-bottom: 0.2rem; }
+    .sb-l { height: 0.3rem; background: var(--border); border-radius: 2px; }
+    .sb-l.s { width: 60%; }
+    .sb-btn { margin-top: auto; width: 40%; height: 0.75rem; background: #F28C28; border-radius: 3px; }
+    .sb-k { font-size: 0.55rem; font-weight: 700; color: var(--ink); letter-spacing: 0.04em; text-transform: uppercase; margin-top: 0.15rem; }
     .thumb-quiz { background: var(--white); padding: 0.8rem 0.95rem; display: flex; flex-direction: column; gap: 0.32rem; height: 100%; }
     .tq-chip { align-self: flex-start; font-size: 0.38rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--off); border-radius: 3px; padding: 0.14rem 0.42rem; margin-bottom: 0.1rem; }
     .tq-stem { height: 5px; background: var(--ink); border-radius: 2px; width: 85%; }
@@ -606,6 +616,17 @@
           <div class="tq-note"><strong>Why:</strong> Effortful retrieval beats fluent re-reading on delayed tests of new cases.</div>
         </div></div>
         <div class="case-body"><div class="case-num">05 · Assessment Design · Interactive</div><div class="case-title">L&amp;D Practice Assessment: 65 Scenario Items You Can Take Live</div><div class="case-tags"><span class="tag tag-p">Assessment Design</span><span class="tag">Item Writing</span><span class="tag">HTML/CSS/JS</span></div><div class="case-outcome"><strong>Take it live.</strong> Scenario items with misconception-built distractors, instant rationales, and a per-domain diagnostic.</div></div>
+      </a>
+      <a class="case case-link" data-tags="id perf" href="case-onboarding.html">
+        <div class="case-thumb"><img class="thumb-img" src="img/pc-welcome.jpg" alt="Storyline course welcome screen for Property Cartwheel" loading="lazy"></div>
+        <div class="case-body"><div class="case-num">06 · Instructional Design · Storyline</div><div class="case-title">Blended Onboarding Program for Leads Managers</div><div class="case-tags"><span class="tag tag-p">Storyline 360</span><span class="tag">Blended Learning</span><span class="tag">Job Aids</span></div><div class="case-outcome"><strong>Click through the demo.</strong> Five-part curriculum, eLearning vs. live vs. job-aid decisions, and a working Storyline prototype.</div></div>
+      </a>
+      <a class="case case-link" data-tags="id" href="case-orientation.html">
+        <div class="case-thumb"><div class="thumb-sb">
+          <div class="sb-head"><span>Storyboard · Slide 2</span><span>Module 1</span></div>
+          <div class="sb-row"><div class="sb-frame"><div class="sb-h"></div><div class="sb-l"></div><div class="sb-l"></div><div class="sb-l s"></div><div class="sb-btn"></div></div><div class="sb-notes"><div class="sb-k">VO</div><div class="sb-l"></div><div class="sb-l s"></div><div class="sb-k">Animation</div><div class="sb-l"></div><div class="sb-l"></div><div class="sb-l s"></div></div></div>
+        </div></div>
+        <div class="case-body"><div class="case-num">07 · Instructional Design · Storyboarding</div><div class="case-title">Story-Driven New Employee Orientation for a Mining Company</div><div class="case-tags"><span class="tag tag-p">Storyboarding</span><span class="tag">Scenario Design</span><span class="tag">Storyline Template</span></div><div class="case-outcome"><strong>Six decks into one story.</strong> Objectives mapped to interactions, with quiz results shaping the ending.</div></div>
       </a>
     </div>
   </section>
