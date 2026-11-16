@@ -348,6 +348,7 @@ table.rnt td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
 .cart-totals .grand{align-items:baseline;margin-top:4px}
 .cart-totals .grand strong{font-family:var(--font-display);font-weight:400;font-size:24px;color:var(--ink)}
 #cartRoot .chip small{margin-left:6px}
+.dclear{align-self:flex-start;padding:2px 0;font-size:12px;color:var(--muted)}
 .cart-added{font-size:13px;font-weight:500;color:var(--ink);background:var(--accent-soft);border-radius:8px;padding:8px 10px;animation:fadeUp .25s var(--ease)}
 .modal footer .msg.cart-count{color:var(--ink);font-weight:600}
 /* ===== PACKING (shared with staff) ===== */
@@ -928,7 +929,7 @@ function openOrder(g){
     body: `<div class="formgrid">
       <label class="f">Customer<input id="oCust" list="dlOCust" value="${esc(first.cur.cust)}"></label>
       <label class="f">Order date<input id="oDate" type="date" value="${toISO(first.cur.date)}"></label>
-      <label class="f full">Delivery date (the day the customer wants it)<input id="oDeliv" type="date" value="${toISO(lv.find(x=>x.cur.deliv)?.cur.deliv || "")}"></label>
+      <label class="f full">Delivery date (leave blank for 5–7 working days)<input id="oDeliv" type="date" value="${toISO(lv.find(x=>x.cur.deliv)?.cur.deliv || "")}"><button type="button" class="link dclear" data-clear="oDeliv">Clear · use 5–7 working days</button></label>
       <div class="full step"><div class="slbl">Payment${st.pay===null?" <span>Mixed: some items paid</span>":""}</div><div class="chips" id="oPay"><button type="button" class="chip" data-pay="">Unpaid</button>${m.map(v=>`<button type="button" class="chip" data-pay="${esc(v)}">Paid · ${esc(v)}</button>`).join("")}</div></div>
       <div class="full step"><div class="slbl">Served${st.served===null?" <span>Mixed</span>":""}</div><div class="chips" id="oServe"><button type="button" class="chip" data-s="">Not yet</button><button type="button" class="chip" data-s="1">Served</button></div></div>
       <div class="full step"><div class="slbl">Items <button type="button" class="link" id="oAdd">+ Add item</button></div><div class="olines" id="oLines">
@@ -1030,7 +1031,7 @@ function rowForm(c, isNew){
     <div class="full" style="margin-top:-6px"><button type="button" class="link" id="customToggle">Not in the list? Type it in</button></div>
     <div class="f">Qty<div class="stepper"><button type="button" id="qMinus" aria-label="Less">−</button><input id="eQty" type="number" min="0" step="1" inputmode="numeric" value="${fmtNum(c.qty)||1}" aria-label="Quantity"><button type="button" id="qPlus" aria-label="More">+</button></div></div>
     <label class="f">Price each<input id="ePrice" type="number" min="0" step="0.01" inputmode="decimal" value="${fmtNum(c.price)}"></label>
-    <label class="f full">Delivery date (the day the customer wants it)<input id="eDeliv" type="date" value="${toISO(c.deliv)}"></label>
+    <label class="f full">Delivery date (leave blank for 5–7 working days)<input id="eDeliv" type="date" value="${toISO(c.deliv)}"><button type="button" class="link dclear" data-clear="eDeliv">Clear · use 5–7 working days</button></label>
     <div class="full step"><div class="slbl">Payment</div><div class="chips" id="payChips">
       <button type="button" class="chip" data-pay="">Unpaid</button>${METHODS.concat(c.method && !METHODS.includes(c.method) ? [c.method] : []).map(m=>`<button type="button" class="chip" data-pay="${esc(m)}">Paid · ${esc(m)}</button>`).join("")}</div></div>
     <div class="full step"><div class="slbl">Served</div><div class="chips" id="serveChips"><button type="button" class="chip" data-s="">Not yet</button><button type="button" class="chip" data-s="1">Served</button></div></div>
@@ -1440,7 +1441,7 @@ function drawPaper(){
   const dueBy = blank ? null : deliverBy(selRows());
   const cell = (l, v, v2) => v ? `<div><div class="p-lbl">${l}</div><div class="v">${v}</div>${v2?`<div class="v2">${esc(v2)}</div>`:""}</div>` : "";
   const head = `<div class="p-head"><div class="p-brand">THE RITUAL EDIT</div><div class="p-title">Order Summary</div></div>
-    <div class="p-info">${cell("Customer", esc(m.bill), m.bill2)}${cell("Order date", esc(longDate(m.date)))}${cell("Order no.", esc(no))}${deliv ? cell("Delivered", esc(deliv)) : dueBy ? cell("Delivery date", esc(dueBy.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}))) : ""}${cell("Status", status)}</div>`;
+    <div class="p-info">${cell("Customer", esc(m.bill), m.bill2)}${cell("Order date", esc(longDate(m.date)))}${cell("Order no.", esc(no))}${deliv ? cell("Delivered", esc(deliv)) : dueBy ? cell("Delivery date", esc(dueBy.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}))) : !blank && meta() ? cell("Delivery", "5–7 working days") : ""}${cell("Status", status)}</div>`;
   const contHead = `<div class="p-cont"><span class="p-brand">THE RITUAL EDIT</span><span>Order Summary${no?" "+esc(no):""} · continued</span></div>`;
   const thead = `<colgroup><col><col style="width:64px"><col style="width:110px"><col style="width:110px"></colgroup>
     <thead><tr><th>Item</th><th class="q">Qty</th><th class="n">Price</th><th class="n">Amount</th></tr></thead>`;
@@ -1539,13 +1540,19 @@ $("pngBtn").addEventListener("click", e => { if(!meta()) return toast("Pick an o
 $("copyBtn").addEventListener("click", async () => {
   const m = meta(); if(!m) return toast("Pick an order first.");
   const t = totals();
-  const text = [`THE RITUAL EDIT — Order Summary ${invNo()}`.trim(), `Customer: ${m.bill}`, `Order date: ${longDate(m.date)}`, ...(() => { const d = blank ? null : deliverBy(selRows()); return d ? [`Delivery date: ${d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})}`] : []; })(), "",
+  const text = [`THE RITUAL EDIT — Order Summary ${invNo()}`.trim(), `Customer: ${m.bill}`, `Order date: ${longDate(m.date)}`, ...(() => { const d = blank ? null : deliverBy(selRows()); return d ? [`Delivery date: ${d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})}`] : [`Delivery: 5–7 working days`]; })(), "",
     ...invItems().map(it=>`${it.title}${it.sub?` (${it.sub})`:""} — ${it.qty} × ${money(it.price)} = ${money(it.qty*it.price - (it.disc||0))}${it.paid?" (paid)":""}`), "",
     ...(t.disc ? [`Discount: −${money(t.disc)}`] : []), ...(t.ship ? [`Shipping: ${money(t.ship)}`] : []),
     `Total: ${money(t.total)}`, ...(t.paid ? [`Paid: ${money(t.paid)}`, `Balance due: ${money(Math.max(0,t.due))}`] : []), "", settings.pay].join("\n");
   try{ await navigator.clipboard.writeText(text); toast("Copied. Paste it into your chat."); } catch(e){ toast("Copy was blocked here. Select the preview text instead."); }
 });
 
+/* Blank delivery date = the standard 5–7 working days. Date pickers on phones can't always be emptied, so each one gets a Clear link. */
+$("mBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-clear]"); if(!b) return;
+  e.preventDefault(); const i = $(b.dataset.clear); if(!i) return;
+  i.value = ""; i.dispatchEvent(new Event("input", { bubbles:true }));
+});
 /* ---------- modal ---------- */
 let modalOk = null, modalAlt = null, modalCancel = null, modalTimer = null;
 function openModal({ title, sub, body, ok, onOk, alt, onCancel }){
@@ -1874,7 +1881,7 @@ function openCart(preset){
         ${preset.cust ? "" : `<label class="f full">Customer<input id="cCust" list="dlCCust" value="${esc(st.cust)}" autocomplete="off" placeholder="Type a name or pick one below"></label>
         ${recent.length ? `<div class="full chips" id="cCustChips">${recent.map(n=>`<button type="button" class="chip" data-v="${esc(n)}" aria-pressed="${nameKey(n)===nameKey(st.cust)}">${esc(n)}</button>`).join("")}</div>` : ""}`}
         <label class="f">Order date<input id="cDate" type="date" value="${st.date}"></label>
-        <label class="f">Delivery date<input id="cDeliv" type="date" value="${st.deliv}"></label>
+        <label class="f">Delivery date<input id="cDeliv" type="date" value="${st.deliv}"><button type="button" class="link dclear" data-clear="cDeliv">Clear · 5–7 working days</button></label>
         <div class="full step"><div class="slbl">1 · Product and size</div><div class="chips" id="cProds"></div></div>
         <div class="full step" id="cScentStep" hidden><div class="slbl">2 · Tap a scent to add it. Tap again for one more.</div><div class="chips" id="cScents"></div>
           <div class="cart-added" id="cAdded" role="status" aria-live="polite" hidden></div>
