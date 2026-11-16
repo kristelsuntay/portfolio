@@ -348,7 +348,9 @@ table.rnt td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
 .cart-totals .grand{align-items:baseline;margin-top:4px}
 .cart-totals .grand strong{font-family:var(--font-display);font-weight:400;font-size:24px;color:var(--ink)}
 #cartRoot .chip small{margin-left:6px}
-.dclear{align-self:flex-start;padding:2px 0;font-size:12px;color:var(--muted)}
+.dchips{margin-top:2px}
+.dchips .chip{padding:6px 12px;font-size:12.5px;min-height:0}
+.dfield input[data-mode="std"],.dfield input[data-mode="none"]{color:var(--muted)}
 .cart-added{font-size:13px;font-weight:500;color:var(--ink);background:var(--accent-soft);border-radius:8px;padding:8px 10px;animation:fadeUp .25s var(--ease)}
 .modal footer .msg.cart-count{color:var(--ink);font-weight:600}
 /* ===== PACKING (shared with staff) ===== */
@@ -634,6 +636,15 @@ const todayISO = () => { const d=new Date(); return new Date(d.getTime()-d.getTi
 const todaySheet = () => { const d=new Date(); return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`; };
 const longDate = iso => { if(!iso) return ""; const [y,m,d]=iso.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}); };
 const shortDate = d => d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+/* Delivery (column I) is one of three things: a date, the standard "5-7 working days", or blank (no date given). */
+const STD_DELIV = "5-7 working days";
+const isStdDeliv = v => /working days/i.test(String(v||""));
+function delivField(id, raw, label){
+  const mode = isStdDeliv(raw) ? "std" : parseSheetDate(raw) ? "date" : "none";
+  return `<div class="f full dfield">${label}<input id="${id}" type="date" value="${mode==="date"?toISO(raw):""}" data-mode="${mode}" aria-label="Delivery date">
+    <div class="chips dchips"><button type="button" class="chip" data-dv="std" aria-pressed="${mode==="std"}">5–7 working days</button><button type="button" class="chip" data-dv="none" aria-pressed="${mode==="none"}">No date</button></div></div>`;
+}
+function delivVal(id){ const i = $(id); if(!i) return ""; return i.dataset.mode === "std" ? STD_DELIV : i.dataset.mode === "none" ? "" : fromISO(i.value); }
 /* Delivery date (column I): the day the customer wants to receive the order. An order is due on the earliest date among its items not served yet. */
 function deliverBy(xs){ const ds = xs.filter(x => !x.cur.served && !isShip(x)).map(x => parseSheetDate(x.cur.deliv)).filter(Boolean); return ds.length ? new Date(Math.min(...ds)) : null; }
 function dueLabel(d){
@@ -929,7 +940,7 @@ function openOrder(g){
     body: `<div class="formgrid">
       <label class="f">Customer<input id="oCust" list="dlOCust" value="${esc(first.cur.cust)}"></label>
       <label class="f">Order date<input id="oDate" type="date" value="${toISO(first.cur.date)}"></label>
-      <label class="f full">Delivery date (leave blank for 5–7 working days)<input id="oDeliv" type="date" value="${toISO(lv.find(x=>x.cur.deliv)?.cur.deliv || "")}"><button type="button" class="link dclear" data-clear="oDeliv">Clear · use 5–7 working days</button></label>
+      ${delivField("oDeliv", lv.find(x=>x.cur.deliv)?.cur.deliv || "", "Delivery")}
       <div class="full step"><div class="slbl">Payment${st.pay===null?" <span>Mixed: some items paid</span>":""}</div><div class="chips" id="oPay"><button type="button" class="chip" data-pay="">Unpaid</button>${m.map(v=>`<button type="button" class="chip" data-pay="${esc(v)}">Paid · ${esc(v)}</button>`).join("")}</div></div>
       <div class="full step"><div class="slbl">Served${st.served===null?" <span>Mixed</span>":""}</div><div class="chips" id="oServe"><button type="button" class="chip" data-s="">Not yet</button><button type="button" class="chip" data-s="1">Served</button></div></div>
       <div class="full step"><div class="slbl">Items <button type="button" class="link" id="oAdd">+ Add item</button></div><div class="olines" id="oLines">
@@ -949,7 +960,7 @@ function openOrder(g){
     </div>`,
     ok: "Save",
     onOk: () => {
-      const cust = $("oCust").value.trim(), date = fromISO($("oDate").value), no = $("oNo").value.trim(), deliv = fromISO($("oDeliv").value);
+      const cust = $("oCust").value.trim(), date = fromISO($("oDate").value), no = $("oNo").value.trim(), deliv = delivVal("oDeliv");
       if(!cust){ $("mMsg").className = "msg err"; $("mMsg").textContent = "Add the customer's name."; return; }
       lv.forEach(x => {
         const line = $("oLines").querySelector(`[data-id="${x.id}"]`);
@@ -1031,7 +1042,7 @@ function rowForm(c, isNew){
     <div class="full" style="margin-top:-6px"><button type="button" class="link" id="customToggle">Not in the list? Type it in</button></div>
     <div class="f">Qty<div class="stepper"><button type="button" id="qMinus" aria-label="Less">−</button><input id="eQty" type="number" min="0" step="1" inputmode="numeric" value="${fmtNum(c.qty)||1}" aria-label="Quantity"><button type="button" id="qPlus" aria-label="More">+</button></div></div>
     <label class="f">Price each<input id="ePrice" type="number" min="0" step="0.01" inputmode="decimal" value="${fmtNum(c.price)}"></label>
-    <label class="f full">Delivery date (leave blank for 5–7 working days)<input id="eDeliv" type="date" value="${toISO(c.deliv)}"><button type="button" class="link dclear" data-clear="eDeliv">Clear · use 5–7 working days</button></label>
+    ${delivField("eDeliv", c.deliv, "Delivery")}
     <div class="full step"><div class="slbl">Payment</div><div class="chips" id="payChips">
       <button type="button" class="chip" data-pay="">Unpaid</button>${METHODS.concat(c.method && !METHODS.includes(c.method) ? [c.method] : []).map(m=>`<button type="button" class="chip" data-pay="${esc(m)}">Paid · ${esc(m)}</button>`).join("")}</div></div>
     <div class="full step"><div class="slbl">Served</div><div class="chips" id="serveChips"><button type="button" class="chip" data-s="">Not yet</button><button type="button" class="chip" data-s="1">Served</button></div></div>
@@ -1134,7 +1145,7 @@ function readForm(x){
   c.date = fromISO($("eDate").value) || c.date || todaySheet(); c.cust = $("eCust").value.trim(); c.item = formItem();
   c.price = parseFloat($("ePrice").value)||0; c.qty = parseFloat($("eQty").value)||0;
   const d = $("eDisc").value; c.disc = d === "" ? (x.orig && x.orig.disc !== "" ? 0 : "") : parseFloat(d)||0;
-  c.no = $("eNo").value.trim(); c.served = fromISO($("eServed").value); c.deliv = fromISO($("eDeliv").value);
+  c.no = $("eNo").value.trim(); c.served = fromISO($("eServed").value); c.deliv = delivVal("eDeliv");
   if(form.paid) c.method = form.method;
   setStatus(x, form.paid);
   if(form.paid) c.paid = fromISO($("ePaidDate").value) || c.paid;
@@ -1441,7 +1452,7 @@ function drawPaper(){
   const dueBy = blank ? null : deliverBy(selRows());
   const cell = (l, v, v2) => v ? `<div><div class="p-lbl">${l}</div><div class="v">${v}</div>${v2?`<div class="v2">${esc(v2)}</div>`:""}</div>` : "";
   const head = `<div class="p-head"><div class="p-brand">THE RITUAL EDIT</div><div class="p-title">Order Summary</div></div>
-    <div class="p-info">${cell("Customer", esc(m.bill), m.bill2)}${cell("Order date", esc(longDate(m.date)))}${cell("Order no.", esc(no))}${deliv ? cell("Delivered", esc(deliv)) : dueBy ? cell("Delivery date", esc(dueBy.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}))) : !blank && meta() ? cell("Delivery", "5–7 working days") : ""}${cell("Status", status)}</div>`;
+    <div class="p-info">${cell("Customer", esc(m.bill), m.bill2)}${cell("Order date", esc(longDate(m.date)))}${cell("Order no.", esc(no))}${deliv ? cell("Delivered", esc(deliv)) : dueBy ? cell("Delivery date", esc(dueBy.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}))) : !blank && selRows().some(x => isStdDeliv(x.cur.deliv)) ? cell("Delivery", "5–7 working days") : ""}${cell("Status", status)}</div>`;
   const contHead = `<div class="p-cont"><span class="p-brand">THE RITUAL EDIT</span><span>Order Summary${no?" "+esc(no):""} · continued</span></div>`;
   const thead = `<colgroup><col><col style="width:64px"><col style="width:110px"><col style="width:110px"></colgroup>
     <thead><tr><th>Item</th><th class="q">Qty</th><th class="n">Price</th><th class="n">Amount</th></tr></thead>`;
@@ -1540,7 +1551,7 @@ $("pngBtn").addEventListener("click", e => { if(!meta()) return toast("Pick an o
 $("copyBtn").addEventListener("click", async () => {
   const m = meta(); if(!m) return toast("Pick an order first.");
   const t = totals();
-  const text = [`THE RITUAL EDIT — Order Summary ${invNo()}`.trim(), `Customer: ${m.bill}`, `Order date: ${longDate(m.date)}`, ...(() => { const d = blank ? null : deliverBy(selRows()); return d ? [`Delivery date: ${d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})}`] : [`Delivery: 5–7 working days`]; })(), "",
+  const text = [`THE RITUAL EDIT — Order Summary ${invNo()}`.trim(), `Customer: ${m.bill}`, `Order date: ${longDate(m.date)}`, ...(() => { const d = blank ? null : deliverBy(selRows()); return d ? [`Delivery date: ${d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})}`] : !blank && selRows().some(x => isStdDeliv(x.cur.deliv)) ? [`Delivery: 5–7 working days`] : []; })(), "",
     ...invItems().map(it=>`${it.title}${it.sub?` (${it.sub})`:""} — ${it.qty} × ${money(it.price)} = ${money(it.qty*it.price - (it.disc||0))}${it.paid?" (paid)":""}`), "",
     ...(t.disc ? [`Discount: −${money(t.disc)}`] : []), ...(t.ship ? [`Shipping: ${money(t.ship)}`] : []),
     `Total: ${money(t.total)}`, ...(t.paid ? [`Paid: ${money(t.paid)}`, `Balance due: ${money(Math.max(0,t.due))}`] : []), "", settings.pay].join("\n");
@@ -1548,11 +1559,20 @@ $("copyBtn").addEventListener("click", async () => {
 });
 
 /* Blank delivery date = the standard 5–7 working days. Date pickers on phones can't always be emptied, so each one gets a Clear link. */
+function setDelivMode(field, mode){
+  const i = field.querySelector('input[type="date"]'); i.dataset.mode = mode; if(mode !== "date") i.value = "";
+  field.querySelectorAll("[data-dv]").forEach(b => b.setAttribute("aria-pressed", b.dataset.dv === mode));
+  i.dispatchEvent(new Event("input", { bubbles:true }));
+}
 $("mBody").addEventListener("click", e => {
-  const b = e.target.closest("[data-clear]"); if(!b) return;
-  e.preventDefault(); const i = $(b.dataset.clear); if(!i) return;
-  i.value = ""; i.dispatchEvent(new Event("input", { bubbles:true }));
+  const b = e.target.closest("[data-dv]"); if(!b) return;
+  e.preventDefault(); const f = b.closest(".dfield"); setDelivMode(f, b.dataset.dv);
 });
+["input","change"].forEach(ev => $("mBody").addEventListener(ev, e => {
+  const f = e.target.closest(".dfield"), i = e.target; if(!f || i.type !== "date") return;
+  if(i.value && i.dataset.mode !== "date") setDelivMode(f, "date");
+  else if(!i.value && i.dataset.mode === "date") setDelivMode(f, "none");
+}, true));
 /* ---------- modal ---------- */
 let modalOk = null, modalAlt = null, modalCancel = null, modalTimer = null;
 function openModal({ title, sub, body, ok, onOk, alt, onCancel }){
@@ -1816,7 +1836,7 @@ function noMcp(){
    Nothing reaches the sheet until "Save order" on the review step, and every line is saved in one go. */
 function openCart(preset){
   preset = preset || {};
-  const st = { cust: preset.cust || "", date: toISO(preset.date) || todayISO(), deliv: toISO(preset.deliv) || "", prod: null, other: false,
+  const st = { cust: preset.cust || "", date: toISO(preset.date) || todayISO(), deliv: preset.deliv !== undefined ? (preset.deliv || "") : STD_DELIV, prod: null, other: false,
     lines: [], discV: "", discT: "pct", ship: "", pay: "", custom: false };
   const cat = catalog();
   /* One chip per product and size. Its price is the category default for that size when there is one. */
@@ -1881,7 +1901,7 @@ function openCart(preset){
         ${preset.cust ? "" : `<label class="f full">Customer<input id="cCust" list="dlCCust" value="${esc(st.cust)}" autocomplete="off" placeholder="Type a name or pick one below"></label>
         ${recent.length ? `<div class="full chips" id="cCustChips">${recent.map(n=>`<button type="button" class="chip" data-v="${esc(n)}" aria-pressed="${nameKey(n)===nameKey(st.cust)}">${esc(n)}</button>`).join("")}</div>` : ""}`}
         <label class="f">Order date<input id="cDate" type="date" value="${st.date}"></label>
-        <label class="f">Delivery date<input id="cDeliv" type="date" value="${st.deliv}"><button type="button" class="link dclear" data-clear="cDeliv">Clear · 5–7 working days</button></label>
+        ${delivField("cDeliv", st.deliv, "Delivery")}
         <div class="full step"><div class="slbl">1 · Product and size</div><div class="chips" id="cProds"></div></div>
         <div class="full step" id="cScentStep" hidden><div class="slbl">2 · Tap a scent to add it. Tap again for one more.</div><div class="chips" id="cScents"></div>
           <div class="cart-added" id="cAdded" role="status" aria-live="polite" hidden></div>
@@ -1918,7 +1938,7 @@ function openCart(preset){
       const t = e.target;
       if(t.id === "cCust") st.cust = t.value;
       else if(t.id === "cDate") st.date = t.value;
-      else if(t.id === "cDeliv") st.deliv = t.value;
+      else if(t.id === "cDeliv") st.deliv = delivVal("cDeliv");
       else if(t.id === "cDisc"){ st.discV = t.value; drawTotals(); }
       else if(t.id === "cDiscT"){ st.discT = t.value; drawTotals(); }
       else if(t.id === "cShip"){ st.ship = t.value; drawTotals(); }
@@ -1939,7 +1959,7 @@ function openCart(preset){
     const err = !cust ? "Add the customer's name." : !st.lines.length ? "Add at least one item." : "";
     if(err){ $("mMsg").className = "msg err"; $("mMsg").textContent = err; return; }
     const d = discAmt(), sh = parseFloat(st.ship)||0;
-    openModal({ title:"Check the order", sub:`${cust}${preset.no?" · "+preset.no:""} · ordered ${longDate(st.date)}${st.deliv?" · deliver "+longDate(st.deliv):""}`,
+    openModal({ title:"Check the order", sub:`${cust}${preset.no?" · "+preset.no:""} · ordered ${longDate(st.date)}${st.deliv ? " · delivery " + (isStdDeliv(st.deliv) ? "5–7 working days" : longDate(toISO(st.deliv))) : ""}`,
       body: `<div class="rnwrap"><table class="rnt"><thead><tr><th>Item</th><th>Qty</th><th style="text-align:right">Amount</th></tr></thead><tbody>
         ${st.lines.map(l => { const it = parseItem(l.item); return `<tr><td>${esc(it.title)}${it.sub?` <span class="fine">· ${esc(it.sub)}</span>`:""}</td><td>${l.qty} × ${money(l.price)}</td><td style="text-align:right">${money(l.qty*l.price)}</td></tr>`; }).join("")}
         ${d?`<tr><td colspan="2">Discount${st.discT==="pct"?` (${fmtNum(st.discV)}%)`:""}</td><td style="text-align:right">−${money(d)}</td></tr>`:""}
@@ -1951,7 +1971,7 @@ function openCart(preset){
   }
 
   async function save(cust){
-    const date = fromISO(st.date) || todaySheet(), deliv = fromISO(st.deliv);
+    const date = fromISO(st.date) || todaySheet(), deliv = st.deliv;
     const no = preset.no || numberFor(cust, date);
     /* The order discount is spread across the lines by value, so each row's DISCOUNT adds up to it exactly. */
     const s = sub(), d = discAmt(); let left = Math.round(d*100)/100;
