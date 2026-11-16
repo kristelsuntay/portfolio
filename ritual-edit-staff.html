@@ -1444,7 +1444,10 @@ function drawPaper(){
   const contHead = `<div class="p-cont"><span class="p-brand">THE RITUAL EDIT</span><span>Order Summary${no?" "+esc(no):""} · continued</span></div>`;
   const thead = `<colgroup><col><col style="width:64px"><col style="width:110px"><col style="width:110px"></colgroup>
     <thead><tr><th>Item</th><th class="q">Qty</th><th class="n">Price</th><th class="n">Amount</th></tr></thead>`;
-  const row = it => { const g = it.qty*it.price, d = it.disc||0;
+  /* Same % on every line = a whole-order discount: show it once in the totals. Different % = show it under each item. */
+  const pcts = items.map(i => i.pct || 0);
+  const wholePct = items.length && pcts.every(p => p > 0) && Math.max(...pcts) - Math.min(...pcts) < 0.05 ? pcts.reduce((a,b) => a+b, 0) / pcts.length : null;
+  const row = it => { const g = it.qty*it.price, d = wholePct ? 0 : (it.disc||0);
     return `<tr><td class="d"><div class="t">${esc(it.title)}</div>${it.sub?`<div class="s">${esc(it.sub)}</div>`:""}${d>0?`<div class="dl">${fmtPct(it.pct)}% off · −${money(d)}</div>`:""}</td>
     <td class="q">${it.qty}</td><td class="n">${money(it.price)}</td><td class="n">${d>0?`<span class="was">${money(g)}</span>${money(g-d)}`:money(g)}</td></tr>`; };
   const pi = items.filter(i=>i.paid), ui = items.filter(i=>!i.paid);
@@ -1453,7 +1456,7 @@ function drawPaper(){
   const L = [];
   const extras = t.disc > 0 || t.ship > 0 || t.paid > 0;
   if(extras) L.push(["Subtotal", money(t.sub)]);
-  if(t.disc > 0) L.push([`Discount${t.samePct ? ` (${fmtPct(t.samePct)}%)` : ""}`, "−" + money(t.disc), "neg"]);
+  if(t.disc > 0) L.push([`Discount${wholePct ? ` (${fmtPct(Math.round(wholePct*10)/10)}%)` : ""}`, "−" + money(t.disc), "neg"]);
   if(t.ship > 0) L.push(["Shipping" + (t.shipPaid ? " (paid)" : ""), money(t.ship)]);
   if(t.paid > 0){ L.push(["Total", money(t.total)]); L.push(["Paid", "−" + money(t.paid), "neg"]); L.push([t.due <= 0.005 ? "Balance" : "Balance due", money(Math.max(0,t.due)), "grand"]); }
   else L.push(["Total due", money(t.total), "grand" + (extras ? "" : " only")]);
