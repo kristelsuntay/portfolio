@@ -282,9 +282,10 @@ table.rnt td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
 .p-brand{font-family:var(--font-mark);font-size:14px;letter-spacing:.44em;font-weight:400}
 .p-title{font-family:var(--font-display);font-size:46px;font-weight:400;line-height:.95;letter-spacing:-.01em;color:#141414}
 .p-lbl{font-size:9.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--p-faint);margin-bottom:12px}
-.p-info{display:flex;flex-wrap:wrap;gap:20px 44px;margin-top:30px}
+.p-info{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,auto);justify-content:space-between;gap:12px 28px;margin-top:30px}
+.p-info > div{min-width:0;overflow-wrap:anywhere}
 .p-info .p-lbl{margin-bottom:6px}
-.p-info .v{font-size:14px;font-weight:500;color:var(--p-ink)}
+.p-info .v{font-size:13.5px;font-weight:500;color:var(--p-ink);line-height:1.4}
 .p-info .v2{font-size:12px;color:var(--p-soft);margin-top:2px}
 .p-info .ok{font-weight:600;letter-spacing:.02em}
 .p-table{margin-top:44px;width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
@@ -301,6 +302,20 @@ table.rnt td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
 .paper.dense .p-table td{padding:11px 0}
 .paper.dense .p-table td.d{padding-right:24px}
 .paper.dense .p-table tr.p-sec td{padding:16px 0 4px}
+.paper.tight{padding:52px 56px 40px}
+.paper.tight .p-head{padding-bottom:18px;gap:10px}
+.paper.tight .p-title{font-size:38px}
+.paper.tight .p-info{margin-top:18px}
+.paper.tight .p-table{margin-top:24px}
+.paper.tight .p-table th{padding-bottom:8px}
+.paper.tight .p-table td{padding:7px 0}
+.paper.tight .p-table .t{font-size:13px;line-height:1.3}
+.paper.tight .p-table .s,.paper.tight .p-table .dl{margin-top:1px;font-size:11.5px}
+.paper.tight .p-table tr.p-sec td{padding:12px 0 3px}
+.paper.tight .p-sum{margin-top:16px}
+.paper.tight .p-qr img{width:110px;height:110px}
+.paper.tight .p-foot{padding-top:18px}
+.paper.tight .p-foot-in{padding-top:12px}
 .p-sum{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;margin-top:26px;align-items:start}
 .p-qr{display:flex;flex-direction:column;gap:10px}
 .p-qr img{width:132px;height:132px;object-fit:contain;display:block;border:1px solid var(--p-rule);padding:6px;background:#fff}
@@ -577,7 +592,6 @@ body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const SHEET_ID = "1A2cpbMncgIm1gOTHNSi7E6r1xwglBI3PM-MODBy7BXc";
 const SHEETS = "Google Sheets";
@@ -1418,7 +1432,6 @@ function renderPaper(){ clearTimeout(paperTimer); paperTimer = setTimeout(drawPa
 function drawPaper(){
   const m = meta() || { date:"", bill:"", bill2:"" };
   const items = meta() ? invItems() : [], t = meta() ? totals() : { sub:0, disc:0, ship:0, total:0, paid:0, due:0, samePct:0 };
-  const dense = items.length > 5;
   const no = invNo();
   const payBy = m.payBy ? ` · pay by ${new Date(m.payBy+"T00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"})}` : "";
   const status = t.total <= 0 ? "" : t.due <= 0.005 ? `<span class="ok">Paid in full</span>` : t.paid > 0 ? `Balance due ${money(t.due)}${payBy}` : `Awaiting payment${payBy}`;
@@ -1449,11 +1462,14 @@ function drawPaper(){
   const tailHTML = `<div class="p-foot"><div class="p-foot-in"><div class="p-lbl">Good to know</div><div><p>${esc(settings.terms)}</p>${settings.contact?`<p class="contact">${esc(settings.contact)}</p>`:""}</div></div></div>`;
 
   // Lay the summary onto real A4 pages: rows move to the next page when they don't fit.
-  const host = $("pages"); host.innerHTML = "";
+  // Try the roomy layout first, then tighter ones, and keep the first that fits on one page.
+  const host = $("pages");
+  const build = cls => {
+  host.innerHTML = "";
   const pages = [];
   const over = pg => pg.scrollHeight > pg.clientHeight + 1;
   const newPage = (first, withTable) => {
-    const pg = document.createElement("div"); pg.className = "paper" + (dense ? " dense" : "");
+    const pg = document.createElement("div"); pg.className = "paper" + (cls ? " " + cls : "");
     pg.innerHTML = (first ? head : contHead) + (withTable ? `<table class="p-table">${thead}<tbody></tbody></table>` : "");
     host.appendChild(pg); pages.push(pg); return pg;
   };
@@ -1474,6 +1490,10 @@ function drawPaper(){
     if(over(pg)){ nodes.forEach(n => n.remove()); pg = newPage(false, false); nodes.forEach(n => pg.appendChild(n)); }
   };
   place(totalsHTML); place(tailHTML);
+  return pages;
+  };
+  let pages = [];
+  for(const cls of (items.length > 5 ? ["dense", "dense tight"] : ["", "dense", "dense tight"])){ pages = build(cls); if(pages.length === 1) break; }
   if(pages.length > 1) pages.forEach((p,i) => p.insertAdjacentHTML("beforeend", `<div class="p-pageno">Page ${i+1} of ${pages.length}</div>`));
   fit();
 }
@@ -1507,8 +1527,12 @@ $("pdfBtn").addEventListener("click", e => { if(!meta()) return toast("Pick an o
 $("pngBtn").addEventListener("click", e => { if(!meta()) return toast("Pick an order first."); busy(e.currentTarget, async () => {
   try{ const canvases = await capturePages(); const blobs = await Promise.all(canvases.map(c => new Promise(r => c.toBlob(r, "image/png"))));
     if(blobs.length === 1) return await saveFile(fileBase()+".png", blobs[0]);
-    const zip = new JSZip(); blobs.forEach((b,i) => zip.file(`${fileBase()} - page ${i+1}.png`, b));
-    await saveFile(fileBase()+" (pages).zip", await zip.generateAsync({ type:"blob" })); }catch(err){ toast("Couldn't build the image: " + (err.message||err)); } }); });
+    /* Longer summaries: pages stacked into one tall image, so it's still a single file to send. */
+    const gap = 24, out = document.createElement("canvas");
+    out.width = canvases[0].width; out.height = canvases.reduce((h,c)=>h+c.height,0) + gap*(canvases.length-1);
+    const g = out.getContext("2d"); g.fillStyle = "#e6e6e3"; g.fillRect(0,0,out.width,out.height);
+    let y = 0; canvases.forEach(c => { g.drawImage(c, 0, y); y += c.height + gap; });
+    await saveFile(fileBase()+".png", await new Promise(r => out.toBlob(r, "image/png"))); }catch(err){ toast("Couldn't build the image: " + (err.message||err)); } }); });
 $("copyBtn").addEventListener("click", async () => {
   const m = meta(); if(!m) return toast("Pick an order first.");
   const t = totals();
