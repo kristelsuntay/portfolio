@@ -1848,7 +1848,10 @@ function openCart(preset){
     return [...m.values()].map(p => ({ ...p, base: p.base ?? Math.min(...p.prices) }))
       .sort((a,b) => a.cat.localeCompare(b.cat) || (parseFloat(a.size)||0) - (parseFloat(b.size)||0));
   })();
-  const scentsFor = p => cat.filter(c => c.cat === p.cat && c.size === p.size && !/^tbd$/i.test(c.scent));
+  /* A product with no scents of its own yet (e.g. a new Wax Melt line) offers every scent you make, at its size's price. */
+  const allScents = [...new Set(cat.filter(c => !/^tbd$/i.test(c.scent) && !/,/.test(c.scent)).map(c => c.scent))].sort();
+  const scentsFor = p => { const own = cat.filter(c => c.cat === p.cat && c.size === p.size && !/^tbd$/i.test(c.scent));
+    return own.length ? own : allScents.map(sc => ({ scent:sc, price:p.base, name:itemName(p, sc) })); };
   const itemName = (p, scent) => [p.cat, scent, p.size].filter(Boolean).join(" - ");
   function addLine(item, price, n = 1){
     const l = st.lines.find(l => nameKey(l.item) === nameKey(item) && l.price === price);
