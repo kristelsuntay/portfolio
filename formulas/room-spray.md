@@ -37,13 +37,13 @@ With about 28% alcohol in the finished spray, it needs no added preservative.
 | Ingredient | Cost per g | Per bottle |
 |---|---|---|
 | Distilled water | ₱0.01 | ₱0.60 |
-| Ethanol 95% | ~₱0.50 (estimate, check real price) | ~₱15.00 |
+| Ethanol 95% | ₱0.235 (Homanka Raw Materials, ₱235/kg) | ₱7.05 |
 | Fragrance oil | ₱5.00 | ₱25.00 |
 | Polysorbate 20 | ₱2.17 | ₱10.85 |
 | DPG | ~₱0.50 (estimate, check real price) | ~₱1.00 |
-| **Liquid total** | | **≈ ₱52** |
+| **Liquid total** | | **≈ ₱44.50** |
 
-Previous method (bought base + 10% oil): ≈ ₱78–85 per 100ml. Saving ≈ ₱30 per bottle.
+Previous method (bought base + 10% oil): ≈ ₱78–85 per 100ml. Saving ≈ ₱34–40 per bottle.
 
 ## Safety
 
@@ -60,5 +60,5 @@ Previous method (bought base + 10% oil): ≈ ₱78–85 per 100ml. Saving ≈ �
 
 ## To confirm
 
-- Real price of ethanol 95% and DPG (both estimated above).
+- Real price of DPG (estimated above).
 - Polysorbate 20 amount per scent (some oils need more than 1:1).
