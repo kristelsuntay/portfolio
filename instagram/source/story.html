@@ -1,74 +1,84 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Jost:wght@400;500&display=block" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:1080px;height:1920px;background:#f7f7f5;color:#1f1f1b;font-family:Inter,sans-serif}
-.page{width:1080px;height:1920px;padding:196px 64px 0;display:flex;flex-direction:column}
-.serif{font-family:'Playfair Display',serif;font-weight:400}
-.eyebrow{font-size:24px;letter-spacing:.2em;text-transform:uppercase;font-weight:500}
-header{text-align:center}
-h1{font-size:94px;line-height:1.05;margin-top:16px;white-space:nowrap;letter-spacing:-.01em}
-h1 em{font-style:italic}
-.products{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:56px}
-.photo{position:relative;height:296px;background:#d6d6d1 center/cover no-repeat}
-.badge{position:absolute;top:18px;left:18px;background:#1f1f1b;color:#f7f7f5;font-size:17px;letter-spacing:.16em;padding:10px 16px;font-weight:500}
-h2{font-size:52px;line-height:1.1;margin-top:22px}
-.desc{font-size:21px;color:#45453f;margin-top:8px;line-height:1.35;min-height:57px}
-.row{display:flex;align-items:center;justify-content:space-between;margin-top:14px}.price{display:flex;align-items:baseline;gap:12px}
-.price b{font-family:'Playfair Display',serif;font-weight:500;font-size:66px;line-height:1}
-.price s{font-size:24px;color:#8a8a84}
-.save{display:inline-block;border:2px solid #1f1f1b;font-size:18px;letter-spacing:.14em;padding:8px 14px;font-weight:500}
-hr{border:0;border-top:1.5px solid #dcdcd7;margin:38px 0 0}
-.choose{text-align:center;font-size:62px;margin-top:28px;line-height:1.1}
-.scents{display:grid;grid-template-columns:1fr 1fr;column-gap:32px;margin-top:32px}
-.col{display:flex;flex-direction:column;gap:14px}
-.col .eyebrow{font-size:20px;margin-bottom:4px}
-.card{border-radius:18px;padding:16px 24px;height:120px;display:flex;flex-direction:column;justify-content:center}
-.card h3{font-family:'Playfair Display',serif;font-weight:400;font-size:36px;line-height:1.1}
-.card p{font-size:18px;line-height:1.3;margin-top:4px}
-.red{background:#b51731;color:#fff}.wine{background:#4a0e1c;color:#fff}.green{background:#233f2f;color:#fff}
-.light{background:#fff;border:1.5px solid #dcdcd7}.light p{color:#45453f}
-footer{margin-top:32px;background:#ececE8;text-align:center;padding:26px 0;font-size:21px;letter-spacing:.16em;font-weight:500}
+:root{--wine:#3d0a16;--wine2:#5a1222;--cream:#f6ead6;--gold:#d8b36a;--muted:#d9c3b0}
+html,body{width:1080px;height:1920px;background:var(--wine);color:var(--cream);font-family:Jost,sans-serif}
+body{background:radial-gradient(ellipse 900px 700px at 50% 22%,#6b1628 0%,var(--wine) 70%)}
+.page{position:relative;width:1080px;height:1920px;padding:166px 64px 0}
+.serif{font-family:'Cormorant Garamond',serif}
+.kicker{display:flex;align-items:center;justify-content:center;gap:18px;color:var(--gold);font-size:22px;letter-spacing:.34em;font-weight:500}
+.kicker:before,.kicker:after{content:"";width:70px;height:1.5px;background:var(--gold);opacity:.7}
+h1{text-align:center;line-height:.9;margin-top:14px}
+h1 .a{display:block;font-style:italic;font-weight:500;font-size:150px;color:var(--cream)}
+h1 .b{display:block;font-weight:500;font-size:64px;letter-spacing:.22em;text-transform:uppercase;margin-top:32px;padding-left:.22em}
+.spark{position:absolute;color:var(--gold);font-size:26px}
+.sets{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:50px}
+.set{text-align:center;position:relative}
+.arch{height:284px;border-radius:50% 50% 18px 18px / 34% 34% 18px 18px;background:#d6d6d1 center 85%/cover no-repeat;border:3px solid var(--gold);outline:1px solid rgba(216,179,106,.3);outline-offset:7px}
+.badge{position:absolute;top:-14px;left:2px;z-index:2;width:104px;height:104px;border-radius:50%;background:var(--gold);color:var(--wine);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:500;font-size:15px;letter-spacing:.14em;line-height:1.25;transform:rotate(-12deg);box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.set h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:54px;line-height:1;margin-top:26px}
+.inc{font-size:19px;color:var(--muted);margin-top:8px;line-height:1.35;min-height:52px}
+.price{margin-top:10px;display:flex;justify-content:center;align-items:baseline;gap:12px}
+.price b{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:64px;color:var(--gold);line-height:1}
+.price s{font-size:22px;color:var(--muted);opacity:.7}
+.save{display:inline-block;margin-top:8px;background:var(--cream);color:var(--wine);font-size:16px;letter-spacing:.2em;font-weight:500;padding:6px 16px;border-radius:40px}
+.scents{margin-top:70px;background:var(--cream);color:var(--wine);border-radius:28px;padding:34px 40px 26px;position:relative}
+.scents h3{text-align:center;font-family:'Cormorant Garamond',serif;font-weight:500;font-style:italic;font-size:56px;line-height:1}
+.scents .sub{text-align:center;font-size:17px;letter-spacing:.3em;color:#8a5a4a;margin-top:8px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:20px}
+.label{font-size:16px;letter-spacing:.3em;font-weight:500;color:#8a5a4a;padding-bottom:10px;border-bottom:1.5px solid #e0cdb4}
+.s{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid #eadcc7}
+.s:last-child{border-bottom:0}
+.dot{flex:none;width:22px;height:22px;border-radius:50%;margin-top:9px}
+.s h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:32px;line-height:1.1}
+.s p{font-size:16.5px;line-height:1.35;color:#6e4a40;margin-top:2px}
+.tag{margin:26px auto 0;width:max-content;display:flex;align-items:center;gap:16px;color:var(--cream);font-size:19px;letter-spacing:.24em;font-weight:500}
+.tag i{display:inline-block;width:40px;height:26px;background:var(--gold);clip-path:polygon(28% 0,100% 0,100% 100%,28% 100%,0 50%);position:relative}
 </style></head>
 <body><div class="page">
-<header>
-  <div class="eyebrow">The Ritual Edit</div>
-  <h1 class="serif">The <em>Holiday</em> Gift Sets</h1>
-</header>
-<section class="products">
-  <div>
-    <div class="photo" style="background-image:url(duo.png)"></div>
-    <h2 class="serif">Holiday Duo</h2>
-    <p class="desc">100ml room spray +<br>300ml handwash</p>
-    <div class="row"><div class="price"><b>₱379</b><s>₱400</s></div>
+<span class="spark" style="top:150px;left:120px">✦</span>
+<span class="spark" style="top:330px;right:110px;font-size:18px">✦</span>
+<span class="spark" style="top:250px;left:180px;font-size:14px">✦</span>
+<div class="kicker">THE RITUAL EDIT</div>
+<h1 class="serif"><span class="a">Holiday</span><span class="b">Gift Sets</span></h1>
+
+<section class="sets">
+  <div class="set">
+    <div class="arch" style="background-image:url(duo.png)"></div>
+    <h2>The Duo</h2>
+    <p class="inc">100ml room spray<br>+ 300ml handwash</p>
+    <div class="price"><b>₱379</b><s>₱400</s></div>
     <span class="save">SAVE ₱21</span>
-    </div>
   </div>
-  <div>
-    <div class="photo" style="background-image:url(trio.png)"><span class="badge">BEST VALUE</span></div>
-    <h2 class="serif">Holiday Trio</h2>
-    <p class="desc">95g candle + 100ml room spray + 300ml handwash</p>
-    <div class="row"><div class="price"><b>₱649</b><s>₱700</s></div>
+  <div class="set">
+    <div class="badge">BEST<br>VALUE</div>
+    <div class="arch" style="background-image:url(trio.png)"></div>
+    <h2>The Trio</h2>
+    <p class="inc">95g candle + 100ml room spray<br>+ 300ml handwash</p>
+    <div class="price"><b>₱649</b><s>₱700</s></div>
     <span class="save">SAVE ₱51</span>
+  </div>
+</section>
+
+<section class="scents">
+  <h3>Choose your scent</h3>
+  <div class="sub">ONE SCENT PER SET</div>
+  <div class="cols">
+    <div>
+      <div class="label">HOLIDAY</div>
+      <div class="s"><span class="dot" style="background:#b51731"></span><div><h4>Sugar &amp; Peppermint</h4><p>Peppermint, dark chocolate, vanilla sugar</p></div></div>
+      <div class="s"><span class="dot" style="background:#5a1222"></span><div><h4>Apple &amp; Cinnamon</h4><p>Apple, cinnamon, nutmeg, clove</p></div></div>
+      <div class="s"><span class="dot" style="background:#233f2f"></span><div><h4>Spruce &amp; Juniper</h4><p>Juniper berry, scotch pine, spruce, spearmint, cedarwood, patchouli</p></div></div>
+    </div>
+    <div>
+      <div class="label">HOUSE</div>
+      <div class="s"><span class="dot" style="background:#e7a3b4"></span><div><h4>Cherry &amp; Sakura</h4><p>Cherry freesia, blackcurrant, lily of the valley, sakura, amber musk</p></div></div>
+      <div class="s"><span class="dot" style="background:#9c8bc4"></span><div><h4>Lavender &amp; Ylang Ylang</h4><p>Lavender, ylang ylang</p></div></div>
+      <div class="s"><span class="dot" style="background:#7fb3bf"></span><div><h4>Orchid &amp; Sea</h4><p>Fresh orchid, white musk, greens, jasmine, sea salt, ozone, tonka bean</p></div></div>
     </div>
   </div>
 </section>
-<hr>
-<h2 class="choose serif">Choose a scent for your set</h2>
-<section class="scents">
-  <div class="col">
-    <div class="eyebrow">Holiday Scents</div>
-    <div class="card red"><h3>Sugar &amp; Peppermint</h3><p>Peppermint, dark chocolate, vanilla sugar</p></div>
-    <div class="card wine"><h3>Apple &amp; Cinnamon</h3><p>Apple, cinnamon, nutmeg, clove</p></div>
-    <div class="card green"><h3>Spruce &amp; Juniper</h3><p>Juniper berry, scotch pine, spruce, spearmint, cedarwood, patchouli</p></div>
-  </div>
-  <div class="col">
-    <div class="eyebrow">House Scents</div>
-    <div class="card light"><h3>Cherry &amp; Sakura</h3><p>Cherry freesia, blackcurrant, lily of the valley, sakura, amber musk</p></div>
-    <div class="card light"><h3>Lavender &amp; Ylang Ylang</h3><p>Lavender, ylang ylang</p></div>
-    <div class="card light"><h3>Orchid &amp; Sea</h3><p>Fresh orchid, white musk, greens, jasmine, sea salt, ozone, tonka bean</p></div>
-  </div>
-</section>
-<footer>EVERY SET COMES WITH A PAPER BAG AND GIFT TAG</footer>
+<div class="tag"><i></i>EVERY SET COMES WITH A PAPER BAG &amp; GIFT TAG</div>
 </div></body></html>
