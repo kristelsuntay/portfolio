@@ -423,6 +423,7 @@ table.rnt td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
 .mk-what .t{font-weight:500}
 .mk-what .d{color:var(--muted);font-size:12.5px}
 .mk-no{font-size:11px;letter-spacing:.04em;opacity:.8}
+.mk-set{display:inline-block;margin-left:8px;padding:2px 7px;border:1px solid currentColor;border-radius:99px;font:500 10px/1.3 var(--font-ui);letter-spacing:.12em;text-transform:uppercase;vertical-align:3px;opacity:.75}
 .mk-late{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--silver);text-underline-offset:3px}
 .mk-done{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;padding:10px 18px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 /* Staff see only the Packing view. This hides the owner's tools from the page; the sheet's own sharing decides what they can really change. */
@@ -2173,12 +2174,18 @@ const Pack = (() => {
     live().filter(x => x.orig && !x.cur.served && !isShip(x) && String(x.cur.item||"").trim()).forEach(x => {
       const sp = splitItem(x.cur.item);
       const scent = !sp.cat ? "Other items" : /^tbd$/i.test(sp.scent) ? "Scent not chosen" : sp.scent;
-      const prod = sp.cat ? [sp.cat, sp.size].filter(Boolean).join(" ") : x.cur.item;
       if(!map.has(scent)) map.set(scent, { scent, lines:new Map(), made:[] });
       const s = map.get(scent);
       if(isMade(x)){ s.made.push(x); return; }
-      if(!s.lines.has(prod)) s.lines.set(prod, { key: scent + "|" + prod, prod, cat:sp.cat, size:sp.size, qty:0, rows:[] });
-      const l = s.lines.get(prod); l.qty += num(x.cur.qty); l.rows.push(x);
+      /* A set is made as its separate products; each part keeps a Set tag and stays apart from single orders. */
+      const isSet = /^(gift )?set$/i.test(sp.cat);
+      const parts = isSet ? setParts(sp.size) : [{ cat: sp.cat, size: sp.size }];
+      parts.forEach(pt => {
+        const prod = pt.cat ? [pt.cat, pt.size].filter(Boolean).join(" ") : x.cur.item;
+        const key = scent + "|" + prod + (isSet ? "|set" : "");
+        if(!s.lines.has(key)) s.lines.set(key, { key, prod, cat: pt.cat, size: pt.size, set: isSet, qty: 0, rows: [] });
+        const l = s.lines.get(key); l.qty += num(x.cur.qty) * (pt.n || 1); l.rows.push(x);
+      });
     });
     return [...map.values()].map(s => {
       const lines = [...s.lines.values()].map(l => ({ ...l, due: deliverBy(l.rows), g: lineGrams(l) * l.qty })).sort((a,b) => (timeOr(a.due) - timeOr(b.due)) || a.prod.localeCompare(b.prod));
@@ -2197,6 +2204,20 @@ const Pack = (() => {
   const saveMk = () => { store.set("tre.make.mode", mk.mode); store.set("tre.make.load", String(mk.load)); store.set("tre.make.sel", JSON.stringify([...mk.sel])); };
   const split = g => { const wax = g / (1 + mk.load/100); return { wax, oil: g - wax }; };
   const gfmt = v => (v >= 1000 ? (v/1000).toFixed(2).replace(/\.?0+$/,"") + " kg" : Math.round(v) + "g");
+  /* "240g candle, room spray & handwash" -> Candle 240g, Room Spray 100ml, Handwash 300ml */
+  function setParts(desc){
+    const parts = String(desc || "").split(/\s*(?:,|&|\+|\band\b)\s*/i).map(t => t.trim()).filter(Boolean);
+    const out = parts.map(t => {
+      const g = t.match(/(\d+(?:\.\d+)?)\s?g\b/i), ml = t.match(/(\d+(?:\.\d+)?)\s?(ml|l)\b/i);
+      if(/candle/i.test(t)) return { cat: "Candle", size: g ? g[1] + "g" : "" };
+      if(/wax ?melt/i.test(t)) return { cat: "Wax Melt", size: g ? g[1] + "g" : "" };
+      if(/spray/i.test(t)) return { cat: "Room Spray", size: ml ? ml[1] + ml[2].toLowerCase() : "100ml" };
+      if(/hand ?wash/i.test(t)) return { cat: "Handwash", size: ml ? ml[1] + ml[2].toLowerCase() : "300ml" };
+      if(/diffuser/i.test(t)) return { cat: "Diffuser Oil", size: ml ? ml[1] + ml[2].toLowerCase() : "" };
+      return { cat: titleCase(t), size: "" };
+    });
+    return out.length ? out : [{ cat: "Set", size: desc }];
+  }
   const firstName = n => String(n||"").split(/\s+/)[0];
   function whoFor(rows){
     const m = new Map();
@@ -2216,7 +2237,7 @@ const Pack = (() => {
     return `<li><div class="mk-line pick">
       <input type="checkbox" class="mk-cb" data-pick="${esc(l.key)}" ${on?"checked":""} aria-label="Tick ${esc(l.prod)} ${esc(l.scent)} for the ingredient total">
       <span class="mk-q">${fmtNum(l.qty)}×</span>
-      <span class="mk-what"><span class="t">${esc(title)}</span><span class="d">${sub ? esc(sub) + " · " : ""}${whoFor(l.rows)}${ld ? ` · <span class="${ld.urgent?"mk-late":""}">${esc(ld.text)}</span>` : ""}</span></span>
+      <span class="mk-what"><span class="t">${esc(title)}${l.set ? `<span class="mk-set">Set</span>` : ""}</span><span class="d">${sub ? esc(sub) + " · " : ""}${whoFor(l.rows)}${ld ? ` · <span class="${ld.urgent?"mk-late":""}">${esc(ld.text)}</span>` : ""}</span></span>
       <button type="button" class="primary" data-made="${esc(l.key)}">Made</button></div></li>`;
   }
   function renderMake(all){
