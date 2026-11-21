@@ -2496,7 +2496,14 @@ const Calc = (() => {
     lines.forEach(l => {
       const q = num0(l.qty); if(!q) return;
       const sc = l.scent || "No scent";
+      const isSet = P.get(l.prod).length > 1;
+      /* Packaging: sets go in the large bag; single items by size. One gift tag per bag or box. */
+      if(isSet){ addC("Paper bag 22 × 10 × 18cm", q); addC("Gift tags", q); }
       (P.get(l.prod) || []).forEach(pt => {
+        if(!isSet){
+          const pk = pt.k === "candle" ? (pt.g >= 150 ? "Mailer box 4 × 4 × 4in" : "Paper bag 12 × 5.7 × 16cm") : pt.k === "spray" ? "Paper bag 12 × 5.7 × 16cm" : pt.k === "hw" ? (pt.g >= 1000 ? "" : "Paper bag 15 × 6 × 20cm") : "";
+          if(pk){ addC(pk, q); addC("Gift tags", q); }
+        }
         pieces += q;
         if(pt.k === "candle" || pt.k === "melt"){
           const w = pt.g / (1 + loadC/100);
@@ -2511,7 +2518,6 @@ const Calc = (() => {
           addC(pt.g >= 1000 ? "1L HDPE bottle" : "300ml pump bottle", q);
         }
       });
-      if(P.get(l.prod).length > 1) addC("Gift bag + tag (sets)", q);
     });
     addC("Labels", pieces);
     const sprayOil = [...oil.values()].reduce((t,o) => t + o.spray, 0);
