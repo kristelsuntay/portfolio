@@ -43,6 +43,8 @@ With about 28% alcohol in the finished spray, it needs no added preservative.
 | DPG | ₱0.50 (Homanka Raw Materials, ₱510/L, about 1.02 g/ml) | ₱1.00 |
 | **Liquid total** | | **≈ ₱44.50** |
 
+**Planned:** buy polysorbate 20 in a 250 g pack (₱338 at Asteria Apothecary, ₱1.35/g). That brings polysorbate to ₱6.76 per bottle and the total to **≈ ₱40.40**. Update this table once bought.
+
 Previous method (bought base + 10% oil): ≈ ₱78–85 per 100ml. Saving ≈ ₱34–40 per bottle.
 
 ## Safety
@@ -61,3 +63,4 @@ Previous method (bought base + 10% oil): ≈ ₱78–85 per 100ml. Saving ≈ �
 ## To confirm
 
 - Polysorbate 20 amount per scent (some oils need more than 1:1).
+- Polysorbate 20 250 g pack: log the purchase and update the cost table.
