@@ -32,7 +32,7 @@ With about 28% alcohol in the finished spray, it needs no added preservative.
 4. If it is hazy, add polysorbate 20 in 0.5 g steps per 100 g until clear. Note the final amount for that scent.
 5. Rest 24–48 hours before bottling.
 
-## Cost per 100ml (estimate)
+## Cost per 100ml
 
 | Ingredient | Cost per g | Per bottle |
 |---|---|---|
@@ -40,7 +40,7 @@ With about 28% alcohol in the finished spray, it needs no added preservative.
 | Ethanol 95% | ₱0.235 (Homanka Raw Materials, ₱235/kg) | ₱7.05 |
 | Fragrance oil | ₱5.00 | ₱25.00 |
 | Polysorbate 20 | ₱2.17 | ₱10.85 |
-| DPG | ~₱0.50 (estimate, check real price) | ~₱1.00 |
+| DPG | ₱0.50 (Homanka Raw Materials, ₱510/L, about 1.02 g/ml) | ₱1.00 |
 | **Liquid total** | | **≈ ₱44.50** |
 
 Previous method (bought base + 10% oil): ≈ ₱78–85 per 100ml. Saving ≈ ₱34–40 per bottle.
@@ -60,5 +60,4 @@ Previous method (bought base + 10% oil): ≈ ₱78–85 per 100ml. Saving ≈ �
 
 ## To confirm
 
-- Real price of DPG (estimated above).
 - Polysorbate 20 amount per scent (some oils need more than 1:1).
