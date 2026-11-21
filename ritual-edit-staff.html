@@ -536,11 +536,12 @@ body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,
     </div>
     <input id="pkSearch" type="search" placeholder="Search customer, item or TRE number" aria-label="Search packing orders">
     <div class="mk-tools" id="mkTools" hidden>
-      <div class="mk-seg" id="mkMode" role="group" aria-label="To make view"><button type="button" data-mode="all" aria-pressed="true">All</button><button type="button" data-mode="custom" aria-pressed="false">Custom batch</button></div>
+      <div class="mk-seg" id="mkMode" role="group" aria-label="Group the list"><button type="button" data-mode="all">All</button><button type="button" data-mode="product">By product</button><button type="button" data-mode="scent">By scent</button></div>
       <select id="mkProd" aria-label="Filter by product"></select>
       <select id="mkScent" aria-label="Filter by scent"></select>
       <label class="mk-load">Oil <input id="mkLoad" type="number" min="1" max="30" step="0.5" inputmode="decimal" aria-label="Fragrance load percent"> %</label>
       <button type="button" class="link" id="mkClear">Reset</button>
+      <button type="button" class="primary" id="mkTotals" style="margin-left:auto">Total ingredients</button>
     </div>
     <div class="pk-list" id="pkList"><div class="skel"></div><div class="skel"></div></div>
     <div class="mk-sum" id="mkSum" hidden></div>
@@ -2091,7 +2092,7 @@ const Pack = (() => {
 
   function render(){
     $("pkTitle").textContent = COPY[sub][0]; $("pkSub").textContent = COPY[sub][1];
-    $("mkTools").hidden = $("mkSum").hidden = sub !== "make" || !loaded;
+    $("mkTools").hidden = sub !== "make" || !loaded; $("mkSum").hidden = true;
     $("pkTabs").querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.v === sub));
     if(!loaded){
       ["pkNMake","pkNPack","pkNCollect","pkNDone"].forEach(id => $(id).textContent = "");
@@ -2142,6 +2143,7 @@ const Pack = (() => {
   $("mkScent").addEventListener("change", e => { mk.scent = e.target.value; render(); });
   $("mkLoad").addEventListener("input", e => { const v = parseFloat(e.target.value); if(v > 0 && v <= 30){ mk.load = v; saveMk(); render(); } });
   $("mkClear").addEventListener("click", () => { mk.sel.clear(); mk.prod = ""; mk.scent = ""; saveMk(); render(); });
+  $("mkTotals").addEventListener("click", openTotals);
   $("pkList").addEventListener("change", e => {
     const t = e.target;
     if(t.dataset.pick){ t.checked ? mk.sel.add(t.dataset.pick) : mk.sel.delete(t.dataset.pick); saveMk(); render(); return; }
@@ -2190,7 +2192,7 @@ const Pack = (() => {
   /* Filled weight of one piece in grams: candles and wax melts sold by grams, and the candle inside a set. */
   const lineGrams = l => /candle|wax melt/i.test(l.cat) && /^\d+(\.\d+)?\s?g$/i.test(l.size) ? parseFloat(l.size) : +((String(l.size).match(/(\d+(?:\.\d+)?)\s?g candle/i) || [])[1] || 0);
   /* Fragrance load is a % of the wax weight, so a filled piece is wax × (1 + load). */
-  const mk = { mode: store.get("tre.make.mode") === "custom" ? "custom" : "all", prod:"", scent:"", load: +(store.get("tre.make.load") || 10) || 10, sel: new Set() };
+  const mk = { mode: ["all","product","scent"].includes(store.get("tre.make.mode")) ? store.get("tre.make.mode") : "all", prod:"", scent:"", load: +(store.get("tre.make.load") || 10) || 10, sel: new Set() };
   try{ JSON.parse(store.get("tre.make.sel") || "[]").forEach(k => mk.sel.add(k)); }catch(e){}
   const saveMk = () => { store.set("tre.make.mode", mk.mode); store.set("tre.make.load", String(mk.load)); store.set("tre.make.sel", JSON.stringify([...mk.sel])); };
   const split = g => { const wax = g / (1 + mk.load/100); return { wax, oil: g - wax }; };
@@ -2201,8 +2203,23 @@ const Pack = (() => {
     rows.forEach(x => { const k = x.cur.no + "|" + x.cur.cust; if(!m.has(k)) m.set(k, { cust:x.cur.cust, no:x.cur.no, q:0 }); m.get(k).q += num(x.cur.qty); });
     return [...m.values()].map(w => `${esc(firstName(w.cust))} ×${w.q}${w.no?` <span class="mk-no">${esc(w.no)}</span>`:""}`).join(" · ");
   }
+  /* Lines still to make, after the product, scent and search filters. */
+  function visibleLines(all){
+    const q = $("pkSearch").value.trim().toLowerCase();
+    return all.flatMap(s => s.lines.map(l => ({ ...l, scent: s.scent })))
+      .filter(l => (!mk.prod || l.prod === mk.prod) && (!mk.scent || l.scent === mk.scent) &&
+        (!q || [l.scent, l.prod, ...l.rows.map(x => x.cur.cust + " " + x.cur.no)].join(" ").toLowerCase().includes(q)));
+  }
+  const byDueLine = (a,b) => (timeOr(a.due) - timeOr(b.due)) || a.scent.localeCompare(b.scent) || a.prod.localeCompare(b.prod, undefined, { numeric:true });
+  function lineHTML(l, title, sub){
+    const ld = dueLabel(l.due), on = mk.sel.has(l.key);
+    return `<li><div class="mk-line pick">
+      <input type="checkbox" class="mk-cb" data-pick="${esc(l.key)}" ${on?"checked":""} aria-label="Tick ${esc(l.prod)} ${esc(l.scent)} for the ingredient total">
+      <span class="mk-q">${fmtNum(l.qty)}×</span>
+      <span class="mk-what"><span class="t">${esc(title)}</span><span class="d">${sub ? esc(sub) + " · " : ""}${whoFor(l.rows)}${ld ? ` · <span class="${ld.urgent?"mk-late":""}">${esc(ld.text)}</span>` : ""}</span></span>
+      <button type="button" class="primary" data-made="${esc(l.key)}">Made</button></div></li>`;
+  }
   function renderMake(all){
-    /* Filter options come from everything still to make. */
     const prods = [...new Set(all.flatMap(s => s.lines.map(l => l.prod)))].sort((a,b) => a.localeCompare(b, undefined, { numeric:true }));
     const scents = all.filter(s => s.lines.length).map(s => s.scent).sort();
     if(mk.prod && !prods.includes(mk.prod)) mk.prod = "";
@@ -2211,45 +2228,54 @@ const Pack = (() => {
     $("mkProd").innerHTML = `<option value="">All products</option>` + prods.map(v => `<option${v===mk.prod?" selected":""}>${esc(v)}</option>`).join("");
     $("mkScent").innerHTML = `<option value="">All scents</option>` + scents.map(v => `<option${v===mk.scent?" selected":""}>${esc(v)}</option>`).join("");
     if(document.activeElement !== $("mkLoad")) $("mkLoad").value = mk.load;
-    const q = $("pkSearch").value.trim().toLowerCase(), custom = mk.mode === "custom";
-    const list = all.map(s => ({ ...s, lines: s.lines.filter(l => (!mk.prod || l.prod === mk.prod) && (!q || [s.scent, l.prod, ...l.rows.map(x => x.cur.cust + " " + x.cur.no)].join(" ").toLowerCase().includes(q))) }))
-      .filter(s => (!mk.scent || s.scent === mk.scent) && (s.lines.length || (!mk.prod && !q && s.made.length)));
-    /* Totals: in Custom, only ticked lines; otherwise everything shown. */
-    const counted = custom ? all.flatMap(s => s.lines.filter(l => mk.sel.has(l.key)).map(l => ({ ...l, scent:s.scent })))
-      : list.flatMap(s => s.lines.map(l => ({ ...l, scent:s.scent })));
-    drawSum(counted, custom);
-    if(!list.length){ $("pkList").innerHTML = `<div class="empty"><strong>${q || mk.prod || mk.scent ? "No matches" : "Nothing to make"}</strong>${q || mk.prod || mk.scent ? "Try another product, scent or name." : "Every open order is made or handed over."}</div>`; return; }
-    $("pkList").innerHTML = list.map((s,i) => {
-      const qty = s.lines.reduce((t,l) => t + l.qty, 0), g = s.lines.reduce((t,l) => t + l.g, 0), sp = split(g);
-      const due = deliverBy(s.lines.flatMap(l => l.rows)), dl = dueLabel(due);
-      const allOn = s.lines.length && s.lines.every(l => mk.sel.has(l.key));
-      return `<article class="pk-ticket mk ${custom && s.lines.some(l => mk.sel.has(l.key)) ? "ready" : ""}" style="--i:${Math.min(i,12)}">
-        <div class="pk-head"><span class="who">${custom && s.lines.length ? `<label class="mk-pick"><input type="checkbox" data-pickscent="${esc(s.scent)}" ${allOn?"checked":""} aria-label="Tick all ${esc(s.scent)}">` : ""}${esc(s.scent)}${custom && s.lines.length ? `</label>` : ""}</span>
-          <span class="meta">${qty ? `<b>${fmtNum(qty)} to make</b>` : "All made"}${g ? ` · ${gfmt(sp.wax)} wax · ${gfmt(sp.oil)} oil` : ""}${dl && qty ? ` · <span class="age ${dl.urgent?"old":""}">${esc(dl.text)}</span>` : ""}</span>
-          <span class="pay">${s.lines.length > 1 ? `<button type="button" data-madeall="${esc(s.scent)}">All made</button>` : ""}</span></div>
-        ${s.lines.length ? `<ul class="pk-items">${s.lines.map(l => { const ld = dueLabel(l.due), on = mk.sel.has(l.key); return `<li><div class="mk-line ${custom?"pick":""}">
-          ${custom ? `<input type="checkbox" class="mk-cb" data-pick="${esc(l.key)}" ${on?"checked":""} aria-label="Add ${esc(l.prod)} ${esc(s.scent)} to batch">` : ""}
-          <span class="mk-q">${fmtNum(l.qty)}×</span>
-          <span class="mk-what"><span class="t">${esc(l.prod)}</span><span class="d">${whoFor(l.rows)}${ld ? ` · <span class="${ld.urgent?"mk-late":""}">${esc(ld.text)}</span>` : ""}${l.g ? ` · ${gfmt(split(l.g).wax)} wax` : ""}</span></span>
-          <button type="button" class="primary" data-made="${esc(l.key)}">Made</button></div></li>`; }).join("")}</ul>` : ""}
-        ${s.made.length && !mk.prod ? `<div class="mk-done"><span>Made, waiting to hand over: ${s.made.map(x => `${fmtNum(num(x.cur.qty))}× ${esc([splitItem(x.cur.item).cat, splitItem(x.cur.item).size].filter(Boolean).join(" ") || x.cur.item)} (${esc(firstName(x.cur.cust))})`).join(", ")}</span>
-          <button type="button" class="link" data-unmade="${esc(s.scent)}">Undo</button></div>` : ""}
+    const ticked = all.flatMap(s => s.lines).filter(l => mk.sel.has(l.key)).length;
+    $("mkTotals").textContent = ticked ? `Total ingredients · ${ticked} ticked` : "Total ingredients";
+    const lines = visibleLines(all);
+    if(!lines.length){
+      const f = $("pkSearch").value.trim() || mk.prod || mk.scent;
+      $("pkList").innerHTML = `<div class="empty"><strong>${f ? "No matches" : "Nothing to make"}</strong>${f ? "Try another product, scent or name." : "Every open order is made or handed over."}</div>`; return;
+    }
+    const head = (title, ls, extra) => { const qty = ls.reduce((t,l) => t + l.qty, 0), g = ls.reduce((t,l) => t + l.g, 0), sp = split(g), dl = dueLabel(deliverBy(ls.flatMap(l => l.rows)));
+      return `<div class="pk-head"><span class="who">${esc(title)}</span>
+        <span class="meta"><b>${fmtNum(qty)} to make</b>${g ? ` · ${gfmt(sp.wax)} wax · ${gfmt(sp.oil)} oil` : ""}${dl ? ` · <span class="age ${dl.urgent?"old":""}">${esc(dl.text)}</span>` : ""}</span>
+        <span class="pay">${extra || ""}</span></div>`; };
+    let groups;
+    if(mk.mode === "all") groups = [{ title: "Everything to make", lines: lines.slice().sort(byDueLine), line: l => lineHTML(l, l.prod, l.scent) }];
+    else if(mk.mode === "product"){
+      const m = new Map(); lines.forEach(l => { if(!m.has(l.prod)) m.set(l.prod, []); m.get(l.prod).push(l); });
+      groups = [...m].sort((a,b) => a[0].localeCompare(b[0], undefined, { numeric:true })).map(([prod, ls]) => ({ title: prod, lines: ls.sort(byDueLine), line: l => lineHTML(l, l.scent) }));
+    } else {
+      const m = new Map(); lines.forEach(l => { if(!m.has(l.scent)) m.set(l.scent, []); m.get(l.scent).push(l); });
+      groups = [...m].map(([scent, ls]) => ({ title: scent, scent, lines: ls.sort(byDueLine), line: l => lineHTML(l, l.prod) }))
+        .sort((a,b) => (timeOr(deliverBy(a.lines.flatMap(l => l.rows))) - timeOr(deliverBy(b.lines.flatMap(l => l.rows)))) || a.title.localeCompare(b.title));
+    }
+    const madeOf = scent => (all.find(s => s.scent === scent) || { made: [] }).made;
+    $("pkList").innerHTML = groups.map((g,i) => {
+      const made = g.scent && !mk.prod ? madeOf(g.scent) : [];
+      return `<article class="pk-ticket mk" style="--i:${Math.min(i,12)}">${head(g.title, g.lines, g.scent && g.lines.length > 1 ? `<button type="button" data-madeall="${esc(g.scent)}">All made</button>` : "")}
+        <ul class="pk-items">${g.lines.map(g.line).join("")}</ul>
+        ${made.length ? `<div class="mk-done"><span>Made, waiting to hand over: ${made.map(x => `${fmtNum(num(x.cur.qty))}× ${esc([splitItem(x.cur.item).cat, splitItem(x.cur.item).size].filter(Boolean).join(" ") || x.cur.item)} (${esc(firstName(x.cur.cust))})`).join(", ")}</span>
+          <button type="button" class="link" data-unmade="${esc(g.scent)}">Undo</button></div>` : ""}
       </article>`;
     }).join("");
   }
-  /* The prep sheet: wax for the whole batch, oil per scent (each scent is a separate oil). */
-  function drawSum(lines, custom){
-    const box = $("mkSum");
-    if(custom && !lines.length){ box.innerHTML = `<div class="mk-sum-in"><span class="mk-sum-k">Custom batch</span><span class="fine">Tick what you want to pour. The wax and oil you need add up here.</span></div>`; return; }
+  /* Total ingredients: the ticked lines, or everything on screen when nothing is ticked. */
+  function openTotals(){
+    const all = makeList(), ticked = all.flatMap(s => s.lines.map(l => ({ ...l, scent: s.scent }))).filter(l => mk.sel.has(l.key));
+    const lines = ticked.length ? ticked : visibleLines(all);
     const pieces = lines.reduce((t,l) => t + l.qty, 0), g = lines.reduce((t,l) => t + l.g, 0), sp = split(g);
     const byScent = new Map(); lines.forEach(l => { if(l.g) byScent.set(l.scent, (byScent.get(l.scent) || 0) + l.g); });
+    const byProd = new Map(); lines.forEach(l => byProd.set(l.prod, (byProd.get(l.prod) || 0) + l.qty));
     const noWeight = lines.filter(l => !l.g);
-    box.innerHTML = `<div class="mk-sum-in">
-      <span class="mk-sum-k">${custom ? "Your batch" : mk.prod || mk.scent ? "Shown" : "Everything to make"} · ${fmtNum(pieces)} piece${pieces===1?"":"s"}</span>
-      <div class="mk-sum-row"><div><span class="mk-big">${g ? gfmt(sp.wax) : "—"}</span><span class="fine">wax</span></div><div><span class="mk-big">${g ? gfmt(sp.oil) : "—"}</span><span class="fine">fragrance oil at ${fmtNum(mk.load)}%</span></div></div>
-      ${byScent.size ? `<ul class="mk-oils">${[...byScent].sort((a,b) => b[1]-a[1]).map(([sc, gg]) => `<li><span>${esc(sc)}</span><span>${gfmt(split(gg).oil)} oil · ${gfmt(split(gg).wax)} wax</span></li>`).join("")}</ul>` : ""}
-      ${noWeight.length ? `<span class="fine">Not counted (no weight): ${noWeight.map(l => `${fmtNum(l.qty)}× ${esc(l.prod)} ${esc(l.scent)}`).join(", ")}</span>` : ""}
-    </div>`;
+    const row = (a, b) => `<tr><td>${a}</td><td style="text-align:right">${b}</td></tr>`;
+    openModal({ title: "Total ingredients", sub: `${ticked.length ? "Ticked items" : "Everything shown"} · ${fmtNum(pieces)} piece${pieces===1?"":"s"} · fragrance at ${fmtNum(mk.load)}%`,
+      body: `<div class="formgrid"><div class="full sum"><span class="fine">Wax</span><strong>${g ? gfmt(sp.wax) : "—"}</strong></div>
+        <div class="full sum"><span class="fine">Fragrance oil, all scents</span><strong>${g ? gfmt(sp.oil) : "—"}</strong></div></div>
+        ${byScent.size ? `<div class="rnwrap"><table class="rnt"><thead><tr><th>Fragrance oil by scent</th><th style="text-align:right">Oil · wax</th></tr></thead><tbody>${[...byScent].sort((a,b) => b[1]-a[1]).map(([sc, gg]) => row(esc(sc), `${gfmt(split(gg).oil)} · ${gfmt(split(gg).wax)}`)).join("")}</tbody></table></div>` : ""}
+        <div class="rnwrap"><table class="rnt"><thead><tr><th>Containers</th><th style="text-align:right">Pieces</th></tr></thead><tbody>${[...byProd].sort((a,b) => a[0].localeCompare(b[0], undefined, { numeric:true })).map(([pr, q]) => row(esc(pr), fmtNum(q))).join("")}</tbody></table></div>
+        ${noWeight.length ? `<p class="fine" style="margin:0">Not in the wax total (no weight in the name): ${noWeight.map(l => `${fmtNum(l.qty)}× ${esc(l.prod)} ${esc(l.scent)}`).join(", ")}</p>` : ""}`,
+      ok: "Done", onOk: () => closeModal(),
+      alt: ticked.length ? { label: "Clear ticks", onClick: () => { mk.sel.clear(); saveMk(); closeModal(); render(); } } : null });
   }
   function confirmMade(rows, title){
     const today = todaySheet();
