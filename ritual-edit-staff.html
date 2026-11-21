@@ -491,7 +491,13 @@ body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,
   input,select,textarea{font-size:16px}
   .wrap{gap:14px;padding-block:14px 40px}
   .navrow{flex-direction:column;align-items:stretch}
-  .tabs button{flex:1;padding:9px 0}
+  .tabs{overflow-x:auto;scrollbar-width:none;max-width:100%;min-width:0}
+  .navrow{min-width:0;max-width:100%}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:1 0 auto;padding:9px 6px;white-space:nowrap;font-size:13px}
+  .tabs .lg{display:none}
+  .top{flex-wrap:wrap;gap:6px 12px}
+  .src{gap:10px;font-size:12px}
   .vtitle{font-size:26px}
   .kpis{grid-template-columns:1fr 1fr}
   .kpi .v{font-size:22px}
@@ -539,7 +545,7 @@ body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,
       <span class="ind" id="tabInd" aria-hidden="true"></span>
       <button type="button" role="tab" id="tabOrders" aria-selected="true">Orders</button>
       <button type="button" role="tab" id="tabPacking" aria-selected="false">Packing</button>
-      <button type="button" role="tab" id="tabInvoice" aria-selected="false">Order Summary</button>
+      <button type="button" role="tab" id="tabInvoice" aria-selected="false"><span class="lg">Order </span>Summary</button>
       <button type="button" role="tab" id="tabCalc" aria-selected="false">Calculator</button>
       <button type="button" role="tab" id="tabHistory" aria-selected="false">History</button>
     </div>
@@ -871,16 +877,18 @@ function issues(){
 
 /* ---------- merge suggestions ----------
    Eligible when: same customer (names compared ignoring case, spaces and punctuation)
-   AND order dates within 3 days, AND served dates don't conflict. Same day = strong match.
+   AND the same order date, AND neither order is already paid in full, AND served dates don't conflict.
+   A new order on another day, or after the earlier one was paid, is a separate order.
    Never merged automatically; the earlier order number wins. */
 function mergeSuggestions(){
-  const gs = orderGroups().filter(g => g.status !== "deleted" && g.first);
+  const paidUp = g => g.rows.length && g.rows.every(x => isPaid(x.cur));
+  const gs = orderGroups().filter(g => g.status !== "deleted" && g.first && !paidUp(g));
   const out = [], seen = new Set();
   for(let i=0;i<gs.length;i++) for(let j=i+1;j<gs.length;j++){
     const a = gs[i], b = gs[j];
     if(nameKey(a.cust) !== nameKey(b.cust) || !nameKey(a.cust)) continue;
     const days = Math.abs(a.first - b.first) / 864e5;
-    if(days > 3) continue;
+    if(days >= 1 || a.first.toDateString() !== b.first.toDateString()) continue;
     const da = new Set(a.rows.map(x=>toISO(x.cur.served)).filter(Boolean)), db = new Set(b.rows.map(x=>toISO(x.cur.served)).filter(Boolean));
     if(da.size && db.size && ![...da].some(d=>db.has(d))) continue;
     const [keep, fold] = (noNum(a.no)||1e9) <= (noNum(b.no)||1e9) ? [a,b] : [b,a];
