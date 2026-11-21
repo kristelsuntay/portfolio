@@ -2459,8 +2459,8 @@ const Calc = (() => {
   const P = new Map(PRODUCTS);
   const num0 = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
   let lines = []; try{ lines = JSON.parse(store.get("tre.calc.lines") || "[]").filter(l => P.has(l.prod)); }catch(e){ lines = []; }
-  let loadC = num0(store.get("tre.calc.loadC")) || 10, loadS = num0(store.get("tre.calc.loadS")) || 10;
-  const save = () => { store.set("tre.calc.lines", JSON.stringify(lines)); store.set("tre.calc.loadC", String(loadC)); store.set("tre.calc.loadS", String(loadS)); };
+  let loadC = num0(store.get("tre.calc.loadC")) || 10, loadS = num0(store.get("tre.calc.loadS2")) || 5;
+  const save = () => { store.set("tre.calc.lines", JSON.stringify(lines)); store.set("tre.calc.loadC", String(loadC)); store.set("tre.calc.loadS2", String(loadS)); };
   const g = v => v >= 1000 ? (v/1000).toFixed(2).replace(/\.?0+$/,"") + " kg" : (v < 10 ? (Math.round(v*10)/10) : Math.round(v)) + "g";
   const ml = v => v >= 1000 ? (v/1000).toFixed(2).replace(/\.?0+$/,"") + " L" : Math.round(v) + "ml";
 
@@ -2544,7 +2544,7 @@ const Calc = (() => {
       <div class="cx-card cx-hero"><div><span class="mk-sum-k">Fragrance oil</span><span class="mk-big">${g(oilTot)}</span></div>
         ${r.wax ? `<div><span class="mk-sum-k">Soy wax</span><span class="mk-big">${g(r.wax)}</span></div>` : ""}
         ${r.hwG ? `<div><span class="mk-sum-k">Handwash base</span><span class="mk-big">${g(r.hwG)}</span></div>` : ""}
-        ${r.sprayMl ? `<div><span class="mk-sum-k">Spray base</span><span class="mk-big">${ml(r.sprayBase)}</span></div>` : ""}
+        ${r.sprayMl ? `<div><span class="mk-sum-k">Room spray</span><span class="mk-big">${g(r.sprayMl)}</span></div>` : ""}
         <div><span class="mk-sum-k">Pieces</span><span class="mk-big">${fmtNum(r.pieces)}</span></div></div>
       <div class="cx-card"><h3>Fragrance oil by scent</h3><table class="rnt"><tbody>
         ${oils.map(([s,o]) => `<tr><td><b>${esc(s)}</b><div class="fine">${parts(o)}</div></td><td style="text-align:right;white-space:nowrap"><b>${g(o.candle+o.hw+o.spray)}</b></td></tr>`).join("")}
@@ -2553,8 +2553,9 @@ const Calc = (() => {
         ${HW.map(([n,v]) => row(esc(n), g(v * r.hwG/300))).join("")}
         ${row("Fragrance oil (by scent, above)", g(HW_OIL * r.hwG/300))}</tbody></table>
         <p class="fine">Mix one batch per scent: split the base by scent, then add that scent's oil.</p></div>` : ""}
-      ${r.sprayMl ? `<div class="cx-card"><h3>Room spray · ${ml(r.sprayMl)}</h3><table class="rnt"><tbody>
-        ${row("Unscented spray base", ml(r.sprayBase))}${row(`Fragrance oil (${fmtNum(loadS)}%)`, g(r.sprayMl - r.sprayBase))}</tbody></table></div>` : ""}
+      ${r.sprayMl ? `<div class="cx-card"><h3>Room spray · ${g(r.sprayMl)} (hybrid)</h3><table class="rnt"><tbody>
+        ${[["Distilled water", 100 - 30 - 2 - 2*loadS], ["Ethanol 95%", 30], [`Fragrance oil (by scent, above)`, loadS], ["Polysorbate 20 (1:1 with oil, more if hazy)", loadS], ["DPG", 2]].map(([n,pc]) => row(esc(n), g(r.sprayMl * pc/100))).join("")}</tbody></table>
+        <p class="fine">Hybrid formula (formulas/room-spray.md). Mix oil + polysorbate + DPG, add ethanol, then water slowly. Flammable: label it.</p></div>` : ""}
       ${r.wax ? `<div class="cx-card"><h3>Candles &amp; melts</h3><table class="rnt"><tbody>
         ${row("Soy wax", g(r.wax))}${row(`Fragrance oil (${fmtNum(loadC)}% of wax)`, g(oils.reduce((t,[,o]) => t + o.candle, 0)))}</tbody></table></div>` : ""}
       <div class="cx-card"><h3>Containers &amp; packaging</h3><table class="rnt"><tbody>
