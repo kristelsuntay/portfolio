@@ -1,0 +1,74 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500&display=block" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;background:#f7f7f5;color:#1f1f1b;font-family:Inter,sans-serif}
+.page{width:1080px;height:1920px;padding:196px 64px 0;display:flex;flex-direction:column}
+.serif{font-family:'Playfair Display',serif;font-weight:400}
+.eyebrow{font-size:24px;letter-spacing:.2em;text-transform:uppercase;font-weight:500}
+header{text-align:center}
+h1{font-size:94px;line-height:1.05;margin-top:16px;white-space:nowrap;letter-spacing:-.01em}
+h1 em{font-style:italic}
+.products{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:56px}
+.photo{position:relative;height:296px;background:#d6d6d1 center/cover no-repeat}
+.badge{position:absolute;top:18px;left:18px;background:#1f1f1b;color:#f7f7f5;font-size:17px;letter-spacing:.16em;padding:10px 16px;font-weight:500}
+h2{font-size:52px;line-height:1.1;margin-top:22px}
+.desc{font-size:21px;color:#45453f;margin-top:8px;line-height:1.35;min-height:57px}
+.row{display:flex;align-items:center;justify-content:space-between;margin-top:14px}.price{display:flex;align-items:baseline;gap:12px}
+.price b{font-family:'Playfair Display',serif;font-weight:500;font-size:66px;line-height:1}
+.price s{font-size:24px;color:#8a8a84}
+.save{display:inline-block;border:2px solid #1f1f1b;font-size:18px;letter-spacing:.14em;padding:8px 14px;font-weight:500}
+hr{border:0;border-top:1.5px solid #dcdcd7;margin:38px 0 0}
+.choose{text-align:center;font-size:62px;margin-top:28px;line-height:1.1}
+.scents{display:grid;grid-template-columns:1fr 1fr;column-gap:32px;margin-top:32px}
+.col{display:flex;flex-direction:column;gap:14px}
+.col .eyebrow{font-size:20px;margin-bottom:4px}
+.card{border-radius:18px;padding:16px 24px;height:120px;display:flex;flex-direction:column;justify-content:center}
+.card h3{font-family:'Playfair Display',serif;font-weight:400;font-size:36px;line-height:1.1}
+.card p{font-size:18px;line-height:1.3;margin-top:4px}
+.red{background:#b51731;color:#fff}.wine{background:#4a0e1c;color:#fff}.green{background:#233f2f;color:#fff}
+.light{background:#fff;border:1.5px solid #dcdcd7}.light p{color:#45453f}
+footer{margin-top:32px;background:#ececE8;text-align:center;padding:26px 0;font-size:21px;letter-spacing:.16em;font-weight:500}
+</style></head>
+<body><div class="page">
+<header>
+  <div class="eyebrow">The Ritual Edit</div>
+  <h1 class="serif">The <em>Holiday</em> Gift Sets</h1>
+</header>
+<section class="products">
+  <div>
+    <div class="photo" style="background-image:url(duo.png)"></div>
+    <h2 class="serif">Holiday Duo</h2>
+    <p class="desc">100ml room spray +<br>300ml handwash</p>
+    <div class="row"><div class="price"><b>₱379</b><s>₱400</s></div>
+    <span class="save">SAVE ₱21</span>
+    </div>
+  </div>
+  <div>
+    <div class="photo" style="background-image:url(trio.png)"><span class="badge">BEST VALUE</span></div>
+    <h2 class="serif">Holiday Trio</h2>
+    <p class="desc">95g candle + 100ml room spray + 300ml handwash</p>
+    <div class="row"><div class="price"><b>₱649</b><s>₱700</s></div>
+    <span class="save">SAVE ₱51</span>
+    </div>
+  </div>
+</section>
+<hr>
+<h2 class="choose serif">Choose a scent for your set</h2>
+<section class="scents">
+  <div class="col">
+    <div class="eyebrow">Holiday Scents</div>
+    <div class="card red"><h3>Sugar &amp; Peppermint</h3><p>Peppermint, dark chocolate, vanilla sugar</p></div>
+    <div class="card wine"><h3>Apple &amp; Cinnamon</h3><p>Apple, cinnamon, nutmeg, clove</p></div>
+    <div class="card green"><h3>Spruce &amp; Juniper</h3><p>Juniper berry, scotch pine, spruce, spearmint, cedarwood, patchouli</p></div>
+  </div>
+  <div class="col">
+    <div class="eyebrow">House Scents</div>
+    <div class="card light"><h3>Cherry &amp; Sakura</h3><p>Cherry freesia, blackcurrant, lily of the valley, sakura, amber musk</p></div>
+    <div class="card light"><h3>Lavender &amp; Ylang Ylang</h3><p>Lavender, ylang ylang</p></div>
+    <div class="card light"><h3>Orchid &amp; Sea</h3><p>Fresh orchid, white musk, greens, jasmine, sea salt, ozone, tonka bean</p></div>
+  </div>
+</section>
+<footer>EVERY SET COMES WITH A PAPER BAG AND GIFT TAG</footer>
+</div></body></html>
