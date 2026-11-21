@@ -58,18 +58,18 @@ Prices are the final amount paid after vouchers.
 | Per bottle | Cost |
 |---|---|
 | Handwash liquid (300g) | ₱33.35 |
-| Plastic pump bottle 300ml (31 Oct: 6 for ₱170) | ₱28.33 |
+| Plastic pump bottle 300ml (21 Nov: 150 for ₱3,600) | ₱24.00 |
 | Label (vinyl sticker, laminate, ink) | ₱1.71 |
-| **Total per bottle** | **≈ ₱63** |
+| **Total per bottle** | **≈ ₱59** |
 
 ## Against your prices
 
 | Price | Profit per bottle | Price ÷ cost |
 |---|---|---|
-| ₱180 (1 to 10) | ₱117 | 2.8× |
-| ₱170 (11 to 49) | ₱107 | 2.7× |
-| ₱160 (50 to 99) | ₱97 | 2.5× |
-| ₱155 (100+) | ₱92 | 2.4× |
+| ₱180 (1 to 10) | ₱121 | 3.0× |
+| ₱170 (11 to 49) | ₱111 | 2.9× |
+| ₱160 (50 to 99) | ₱101 | 2.7× |
+| ₱155 (100+) | ₱96 | 2.6× |
 
 Fragrance oil is 45% of the liquid cost. Each extra 0.5% of fragrance adds ₱7.50 per bottle.
 
@@ -80,7 +80,7 @@ The handwash label is 2.25 × 3.75 in, so 9 fit on one A4 sheet (3 across, 3 dow
 | Per A4 sheet | Cost | Source |
 |---|---|---|
 | Vinyl sticker, glossy | ₱6.40 | Yasen A4 glossy, 20 sheets for ₱128 (8 Nov) |
-| Cold laminating film, matte | ₱4.00 | QUAFF A4 matte, ₱80 a pack, assumed 20 sheets |
+| Cold laminating film, matte | ₱4.00 | QUAFF A4 matte, ₱80 for 20 sheets |
 | Ink | ₱5.00 | Assumed for a full-colour sheet with a burgundy background, home inkjet |
 | **Per sheet** | **₱15.40** | |
 | **Per label (÷ 9)** | **₱1.71** | |
@@ -89,5 +89,5 @@ The printer itself isn't counted: you already own it.
 
 ## To confirm
 
-- The laminating film's sheets per pack and the ink per sheet are assumptions. Send me the real numbers and I'll update the label cost.
+- The laminating film is 20 sheets per pack (confirmed). Ink per sheet is still an assumption.
 - One bottle is taken as 300g. Handwash is slightly heavier than water (about 1.03 g/ml), so a full 300ml bottle holds about 310g, roughly ₱1 more liquid.

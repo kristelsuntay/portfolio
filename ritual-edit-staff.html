@@ -427,7 +427,7 @@ table.rnt td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
 .mk-late{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--silver);text-underline-offset:3px}
 .mk-done{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;padding:10px 18px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 /* Staff see only the Packing view. This hides the owner's tools from the page; the sheet's own sharing decides what they can really change. */
-body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,body.staff #viewInvoice,body.staff #viewHistory{display:none!important}
+body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,body.staff #viewInvoice,body.staff #viewHistory,body.staff #viewCalc{display:none!important}
 @media (max-width:720px){
   .pk-tabs button{flex-direction:column;gap:0;padding:8px 4px;font-size:13.5px}
   .pk-head{padding:14px 14px 10px}
@@ -447,6 +447,25 @@ body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(150,152,156,.5)}70%{box-shadow:0 0 0 7px rgba(150,152,156,0)}100%{box-shadow:0 0 0 0 rgba(150,152,156,0)}}
 @keyframes sheetIn{from{transform:translateY(100%)}}
 @keyframes sheetOut{to{transform:translateY(100%)}}
+.cx{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.cx-in{display:flex;flex-direction:column;gap:12px}
+.cx-add{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.2fr) 72px auto;gap:8px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.cx-f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.cx-f select,.cx-f input{width:100%;min-width:0}
+.cx-set{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.cx-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.cx-line{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.cx-line input{width:64px;padding:7px 8px;font-variant-numeric:tabular-nums}
+.cx-line .x{border:none;background:none;font-size:20px;line-height:1;padding:6px 10px;color:var(--muted)}
+.cx-out{display:flex;flex-direction:column;gap:12px}
+.cx-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+.cx-card h3{margin:0 0 8px;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.cx-card .rnt{width:100%}
+.cx-card .fine{margin:8px 0 0}
+.cx-hero{background:var(--ink);color:var(--bg);border-color:var(--ink);display:flex;flex-wrap:wrap;gap:14px 28px}
+.cx-hero > div{display:flex;flex-direction:column}
+@media (max-width:880px){.cx{grid-template-columns:1fr}}
+@media (max-width:520px){.cx-add{grid-template-columns:minmax(0,1fr) 72px}.cx-add .cx-f:first-child,.cx-add .cx-f:nth-child(2){grid-column:1/-1}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
 @media (max-width:880px){.app{display:flex;flex-direction:column;gap:14px}.side{display:contents}.side > .card:first-child{order:1}.app > .main{order:2}.side > .card:last-child{order:3}}
@@ -503,6 +522,7 @@ body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,
       <button type="button" role="tab" id="tabOrders" aria-selected="true">Orders</button>
       <button type="button" role="tab" id="tabPacking" aria-selected="false">Packing</button>
       <button type="button" role="tab" id="tabInvoice" aria-selected="false">Order Summary</button>
+      <button type="button" role="tab" id="tabCalc" aria-selected="false">Calculator</button>
       <button type="button" role="tab" id="tabHistory" aria-selected="false">History</button>
     </div>
   </div>
@@ -615,6 +635,28 @@ body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,
         </div>
         <div class="stage" id="stage"><div class="scaler" id="scaler"><div id="pages"></div></div></div>
       </div>
+    </div>
+  </section>
+
+  <section id="viewCalc" class="view" hidden>
+    <div class="vhead"><div><h1 class="vtitle">Calculator</h1><p class="vsub">Add what you want to make. Your prep list updates as you go.</p></div>
+      <div class="acts"><button type="button" id="cxLoad">Load To make list</button><button type="button" id="cxClear">Clear</button></div></div>
+    <div class="cx">
+      <div class="cx-in">
+        <form class="cx-add" id="cxForm">
+          <label class="cx-f"><span class="fine">Product</span><select id="cxProd"></select></label>
+          <label class="cx-f"><span class="fine">Scent</span><input id="cxScent" list="cxScents" placeholder="Type or pick" autocomplete="off"><datalist id="cxScents"></datalist></label>
+          <label class="cx-f cx-q"><span class="fine">Qty</span><input id="cxQty" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
+          <button type="submit" class="primary">+ Add</button>
+        </form>
+        <div class="cx-set">
+          <label class="mk-load">Candle oil <input id="cxLoadC" type="number" min="1" max="30" step="0.5" inputmode="decimal"> %</label>
+          <label class="mk-load">Room spray oil <input id="cxLoadS" type="number" min="1" max="40" step="0.5" inputmode="decimal"> %</label>
+          <span class="fine">Handwash oil 1% (your formula)</span>
+        </div>
+        <ul class="cx-list" id="cxList"></ul>
+      </div>
+      <div class="cx-out" id="cxOut"></div>
     </div>
   </section>
 
@@ -1243,7 +1285,7 @@ function moveInd(){
 }
 function setView(v){
   view = v;
-  [["orders","tabOrders","viewOrders"],["packing","tabPacking","viewPacking"],["invoice","tabInvoice","viewInvoice"],["history","tabHistory","viewHistory"]].forEach(([k,t,s]) => {
+  [["orders","tabOrders","viewOrders"],["packing","tabPacking","viewPacking"],["invoice","tabInvoice","viewInvoice"],["calc","tabCalc","viewCalc"],["history","tabHistory","viewHistory"]].forEach(([k,t,s]) => {
     $(t).setAttribute("aria-selected", v===k); const el = $(s); el.hidden = v!==k;
     if(v===k){ el.classList.remove("enter"); void el.offsetWidth; el.classList.add("enter"); }
   });
@@ -1251,6 +1293,7 @@ function setView(v){
   if(v==="orders") renderLog();
   else if(v==="invoice"){ ensureSelection(); renderOrders(); fillEditor(); drawPaper(); }
   else if(v==="packing") Pack.render();
+  else if(v==="calc") Calc.render();
   else { renderHistory(); if(mcp) loadHistory(); }
   scrollTo({ top:0, behavior:"smooth" });
 }
@@ -2388,6 +2431,149 @@ const Pack = (() => {
     const u = await claude.use("user");
     if(u && !(await u.isOwner())){ document.body.classList.add("staff"); setView("packing"); }
   })();
+  return { render, makeList, setParts };
+})();
+</script>
+<script>
+/* ---------- CALCULATOR: what to make -> what to prep ---------- */
+const Calc = (() => {
+  /* Handwash formula, grams per 300g bottle (formulas/handwash.md). Fragrance oil is counted per scent. */
+  const HW = [["Distilled water",210.6],["Glycerin",9],["SLES 70%",36],["CAPB (coco betaine)",30],["Phenoxyethanol",3],["Salt (to thicken, approx.)",6.9],["Polysorbate 20",0.9],["Disodium EDTA",0.3],["Citric acid (to pH, approx.)",0.3]];
+  const HW_OIL = 3; /* g per 300g */
+  const CONT = { "95g":"100ml frosted jar + silver lid", "150g":"200ml frosted vessel + lid", "230g":"320ml frosted vessel + lid", "240g":"320ml frosted vessel + lid" };
+  /* Each product is made of parts: candle (g), melt (g), spray (ml), hw (g). */
+  const PRODUCTS = [
+    ["Candle 95g", [{k:"candle",g:95}]],
+    ["Candle 150g", [{k:"candle",g:150}]],
+    ["Candle 230g", [{k:"candle",g:230}]],
+    ["Wax Melt 50g", [{k:"melt",g:50}]],
+    ["Wax Melt 100g", [{k:"melt",g:100}]],
+    ["Room Spray 100ml", [{k:"spray",ml:100}]],
+    ["Handwash 300ml", [{k:"hw",g:300}]],
+    ["Handwash 1L", [{k:"hw",g:1000}]],
+    ["Holiday Trio (95g candle, spray, handwash)", [{k:"candle",g:95},{k:"spray",ml:100},{k:"hw",g:300}]],
+    ["Holiday Duo (spray, handwash)", [{k:"spray",ml:100},{k:"hw",g:300}]],
+    ["Set: 95g candle & handwash", [{k:"candle",g:95},{k:"hw",g:300}]],
+    ["Set: 230g candle, spray & handwash", [{k:"candle",g:230},{k:"spray",ml:100},{k:"hw",g:300}]]
+  ];
+  const P = new Map(PRODUCTS);
+  const num0 = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+  let lines = []; try{ lines = JSON.parse(store.get("tre.calc.lines") || "[]").filter(l => P.has(l.prod)); }catch(e){ lines = []; }
+  let loadC = num0(store.get("tre.calc.loadC")) || 10, loadS = num0(store.get("tre.calc.loadS")) || 10;
+  const save = () => { store.set("tre.calc.lines", JSON.stringify(lines)); store.set("tre.calc.loadC", String(loadC)); store.set("tre.calc.loadS", String(loadS)); };
+  const g = v => v >= 1000 ? (v/1000).toFixed(2).replace(/\.?0+$/,"") + " kg" : (v < 10 ? (Math.round(v*10)/10) : Math.round(v)) + "g";
+  const ml = v => v >= 1000 ? (v/1000).toFixed(2).replace(/\.?0+$/,"") + " L" : Math.round(v) + "ml";
+
+  $("cxProd").innerHTML = PRODUCTS.map(([n]) => `<option>${esc(n)}</option>`).join("");
+  function scents(){
+    let list = []; try{ list = catalog().map(p => p.scent); }catch(e){}
+    return [...new Set(list.concat(lines.map(l => l.scent)).filter(s => s && s !== "*" && !/^tbd$/i.test(s)))].sort();
+  }
+
+  /* "Set - Spruce & Juniper - Holiday Trio: 95g candle, ..." from the To make list -> calculator parts */
+  function fromMakeList(){
+    let mk = []; try{ mk = Pack.makeList(); }catch(e){}
+    const out = [];
+    mk.forEach(s => s.lines.forEach(l => {
+      const cat = String(l.cat||""), size = String(l.size||"");
+      let prod = null;
+      if(/candle/i.test(cat)){ const n = parseFloat(size); prod = n >= 200 ? "Candle 230g" : n >= 120 ? "Candle 150g" : "Candle 95g"; }
+      else if(/wax ?melt/i.test(cat)) prod = parseFloat(size) >= 75 ? "Wax Melt 100g" : "Wax Melt 50g";
+      else if(/spray/i.test(cat)) prod = "Room Spray 100ml";
+      else if(/hand ?wash/i.test(cat)) prod = /1\s?l\b|1000/i.test(size) ? "Handwash 1L" : "Handwash 300ml";
+      if(!prod || !s.scent || /not chosen|other items/i.test(s.scent)) return;
+      const ex = out.find(o => o.prod === prod && o.scent === s.scent);
+      if(ex) ex.qty += l.qty; else out.push({ prod, scent: s.scent, qty: l.qty });
+    }));
+    return out;
+  }
+
+  function compute(){
+    const oil = new Map(), cont = new Map();
+    let wax = 0, hwG = 0, sprayMl = 0, pieces = 0;
+    const addOil = (sc, part, v) => { if(!oil.has(sc)) oil.set(sc, { candle:0, hw:0, spray:0 }); oil.get(sc)[part] += v; };
+    const addC = (k, v) => cont.set(k, (cont.get(k) || 0) + v);
+    lines.forEach(l => {
+      const q = num0(l.qty); if(!q) return;
+      const sc = l.scent || "No scent";
+      (P.get(l.prod) || []).forEach(pt => {
+        pieces += q;
+        if(pt.k === "candle" || pt.k === "melt"){
+          const w = pt.g / (1 + loadC/100);
+          wax += w * q; addOil(sc, "candle", (pt.g - w) * q);
+          if(pt.k === "candle"){ addC(CONT[pt.g + "g"] || `${pt.g}g candle container + lid`, q); addC("Wicks", q); }
+          else addC(`Wax melt clamshell ${pt.g}g`, q);
+        } else if(pt.k === "spray"){
+          sprayMl += pt.ml * q; addOil(sc, "spray", pt.ml * loadS/100 * q);
+          addC("100ml black frosted spray bottle", q);
+        } else if(pt.k === "hw"){
+          hwG += pt.g * q; addOil(sc, "hw", HW_OIL * pt.g/300 * q);
+          addC(pt.g >= 1000 ? "1L HDPE bottle" : "300ml pump bottle", q);
+        }
+      });
+      if(P.get(l.prod).length > 1) addC("Gift bag + tag (sets)", q);
+    });
+    addC("Labels", pieces);
+    const sprayOil = [...oil.values()].reduce((t,o) => t + o.spray, 0);
+    return { oil, cont, wax, hwG, sprayMl, sprayBase: sprayMl - sprayOil, pieces };
+  }
+
+  function render(){
+    const sc = scents();
+    $("cxScents").innerHTML = sc.map(s => `<option value="${esc(s)}">`).join("");
+    if(document.activeElement !== $("cxLoadC")) $("cxLoadC").value = loadC;
+    if(document.activeElement !== $("cxLoadS")) $("cxLoadS").value = loadS;
+    $("cxList").innerHTML = lines.length ? lines.map((l,i) => `<li class="cx-line">
+        <input type="number" min="0" step="1" value="${esc(String(l.qty))}" data-q="${i}" aria-label="Quantity of ${esc(l.prod)} ${esc(l.scent)}">
+        <span class="mk-what"><span class="t">${esc(l.prod)}</span><span class="d">${esc(l.scent || "No scent")}</span></span>
+        <button type="button" class="x" data-rm="${i}" aria-label="Remove">×</button></li>`).join("")
+      : `<li class="empty"><strong>Nothing added</strong>Add a product above, or load your To make list.</li>`;
+    const r = compute();
+    if(!lines.length){ $("cxOut").innerHTML = ""; return; }
+    const row = (a, b, cls="") => `<tr class="${cls}"><td>${a}</td><td style="text-align:right">${b}</td></tr>`;
+    const oils = [...r.oil].sort((a,b) => (b[1].candle+b[1].hw+b[1].spray) - (a[1].candle+a[1].hw+a[1].spray));
+    const oilTot = oils.reduce((t,[,o]) => t + o.candle + o.hw + o.spray, 0);
+    const parts = o => [o.candle && `candle ${g(o.candle)}`, o.hw && `handwash ${g(o.hw)}`, o.spray && `spray ${g(o.spray)}`].filter(Boolean).join(" · ");
+    $("cxOut").innerHTML = `
+      <div class="cx-card cx-hero"><div><span class="mk-sum-k">Fragrance oil</span><span class="mk-big">${g(oilTot)}</span></div>
+        ${r.wax ? `<div><span class="mk-sum-k">Soy wax</span><span class="mk-big">${g(r.wax)}</span></div>` : ""}
+        ${r.hwG ? `<div><span class="mk-sum-k">Handwash base</span><span class="mk-big">${g(r.hwG)}</span></div>` : ""}
+        ${r.sprayMl ? `<div><span class="mk-sum-k">Spray base</span><span class="mk-big">${ml(r.sprayBase)}</span></div>` : ""}
+        <div><span class="mk-sum-k">Pieces</span><span class="mk-big">${fmtNum(r.pieces)}</span></div></div>
+      <div class="cx-card"><h3>Fragrance oil by scent</h3><table class="rnt"><tbody>
+        ${oils.map(([s,o]) => `<tr><td><b>${esc(s)}</b><div class="fine">${parts(o)}</div></td><td style="text-align:right;white-space:nowrap"><b>${g(o.candle+o.hw+o.spray)}</b></td></tr>`).join("")}
+        ${row("<b>Total</b>", `<b>${g(oilTot)}</b>`)}</tbody></table></div>
+      ${r.hwG ? `<div class="cx-card"><h3>Handwash batch · ${g(r.hwG)}</h3><table class="rnt"><tbody>
+        ${HW.map(([n,v]) => row(esc(n), g(v * r.hwG/300))).join("")}
+        ${row("Fragrance oil (by scent, above)", g(HW_OIL * r.hwG/300))}</tbody></table>
+        <p class="fine">Mix one batch per scent: split the base by scent, then add that scent's oil.</p></div>` : ""}
+      ${r.sprayMl ? `<div class="cx-card"><h3>Room spray · ${ml(r.sprayMl)}</h3><table class="rnt"><tbody>
+        ${row("Unscented spray base", ml(r.sprayBase))}${row(`Fragrance oil (${fmtNum(loadS)}%)`, g(r.sprayMl - r.sprayBase))}</tbody></table></div>` : ""}
+      ${r.wax ? `<div class="cx-card"><h3>Candles &amp; melts</h3><table class="rnt"><tbody>
+        ${row("Soy wax", g(r.wax))}${row(`Fragrance oil (${fmtNum(loadC)}% of wax)`, g(oils.reduce((t,[,o]) => t + o.candle, 0)))}</tbody></table></div>` : ""}
+      <div class="cx-card"><h3>Containers &amp; packaging</h3><table class="rnt"><tbody>
+        ${[...r.cont].map(([k,v]) => row(esc(k), fmtNum(v))).join("")}</tbody></table></div>`;
+  }
+
+  $("cxForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const prod = $("cxProd").value, scent = $("cxScent").value.trim(), qty = Math.max(1, Math.round(num0($("cxQty").value)) || 1);
+    const ex = lines.find(l => l.prod === prod && nameKey(l.scent) === nameKey(scent));
+    if(ex) ex.qty = num0(ex.qty) + qty; else lines.push({ prod, scent, qty });
+    $("cxQty").value = 1; save(); render(); $("cxScent").focus(); $("cxScent").select();
+  });
+  $("cxList").addEventListener("input", e => { const i = e.target.dataset.q; if(i === undefined) return; lines[+i].qty = Math.max(0, num0(e.target.value)); save(); render(); setTimeout(() => { const el = $("cxList").querySelector(`[data-q="${i}"]`); if(el){ el.focus(); const v = el.value; el.value = ""; el.value = v; } }); });
+  $("cxList").addEventListener("click", e => { const b = e.target.closest("[data-rm]"); if(!b) return; lines.splice(+b.dataset.rm, 1); save(); render(); });
+  $("cxLoadC").addEventListener("input", e => { const v = num0(e.target.value); if(v > 0){ loadC = v; save(); render(); } });
+  $("cxLoadS").addEventListener("input", e => { const v = num0(e.target.value); if(v > 0){ loadS = v; save(); render(); } });
+  $("cxClear").addEventListener("click", () => { lines = []; save(); render(); });
+  $("cxLoad").addEventListener("click", () => {
+    const add = fromMakeList();
+    if(!add.length){ toast("Nothing on the To make list"); return; }
+    add.forEach(a => { const ex = lines.find(l => l.prod === a.prod && nameKey(l.scent) === nameKey(a.scent)); if(ex) ex.qty = num0(ex.qty) + a.qty; else lines.push(a); });
+    save(); render(); toast(`Added ${add.length} line${add.length===1?"":"s"} from To make`);
+  });
+  $("tabCalc").addEventListener("click", () => setView("calc"));
   return { render };
 })();
 </script>
