@@ -13,22 +13,22 @@ h1{font-size:102px;line-height:1;margin-top:32px;letter-spacing:-.01em}
 h1 em{color:var(--wine)}
 .lede{font-size:22px;line-height:1.5;color:var(--soft);margin-top:20px;max-width:900px}
 .sets{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:44px}
-.ph{height:284px;background:#d6d6d1 center/cover no-repeat}
+.ph{height:270px;background:#d6d6d1 center/cover no-repeat}
 .num{font-size:16px;color:var(--soft);margin-top:20px;letter-spacing:.06em}
 .set h2{font-size:42px;line-height:1.1;margin-top:6px}
-.contents{margin-top:12px;font-size:18px;line-height:1.6}
+.contents{margin-top:12px;font-size:18px;line-height:1.6;height:87px}
 .contents span{color:var(--soft)}
 .price{margin-top:14px;font-size:20px;font-weight:500}
 .price small{display:block;font-weight:400;font-size:16px;color:var(--soft);margin-top:2px}
-.scents{margin-top:76px}
+.scents{margin-top:60px}
 .scents h3{font-size:52px;line-height:1}
 .scents .note{font-size:18px;color:var(--soft);margin-top:12px}
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:30px}
+.grid{display:grid;grid-template-columns:1fr 1fr;column-gap:28px;grid-auto-rows:auto;margin-top:30px}
 .lbl{font-size:16px;letter-spacing:.08em;color:var(--soft);padding-bottom:12px;border-bottom:1px solid var(--rule)}
-.s{padding:11px 0;border-bottom:1px solid var(--rule)}
+.s{height:112px;padding:14px 0 0;border-bottom:1px solid var(--rule)}
 .s h4{font-size:27px;line-height:1.15}
 .s p{font-size:16px;line-height:1.45;color:var(--soft);margin-top:4px}
-.foot{margin-top:28px;font-size:18px;color:var(--soft)}
+.foot{margin-top:34px;font-size:18px;color:var(--soft)}
 </style></head>
 <body><div class="page">
 <div class="top"><b>The Ritual Edit</b><span>Holiday 2026</span></div>
@@ -54,19 +54,14 @@ h1 em{color:var(--wine)}
 
 <section class="scents">
   <h3 class="pf">Choose a scent</h3>
-  <div class="cols">
-    <div>
-      <div class="lbl">Holiday</div>
-      <div class="s"><h4 class="pf">Sugar &amp; Peppermint</h4><p>Peppermint, dark chocolate, vanilla sugar</p></div>
-      <div class="s"><h4 class="pf">Apple &amp; Cinnamon</h4><p>Apple, cinnamon, nutmeg, clove</p></div>
-      <div class="s"><h4 class="pf">Spruce &amp; Juniper</h4><p>Juniper berry, scotch pine, spruce, spearmint, cedarwood, patchouli</p></div>
-    </div>
-    <div>
-      <div class="lbl">House</div>
-      <div class="s"><h4 class="pf">Cherry &amp; Sakura</h4><p>Cherry freesia, blackcurrant, lily of the valley, sakura, amber musk</p></div>
-      <div class="s"><h4 class="pf">Lavender &amp; Ylang Ylang</h4><p>Lavender, ylang ylang</p></div>
-      <div class="s"><h4 class="pf">Orchid &amp; Sea</h4><p>Fresh orchid, white musk, greens, jasmine, sea salt, ozone, tonka bean</p></div>
-    </div>
+  <div class="grid">
+    <div class="lbl">Holiday</div><div class="lbl">House</div>
+    <div class="s"><h4 class="pf">Sugar &amp; Peppermint</h4><p>Peppermint, dark chocolate, vanilla sugar</p></div>
+    <div class="s"><h4 class="pf">Cherry &amp; Sakura</h4><p>Cherry freesia, blackcurrant, lily of the valley, sakura, amber musk</p></div>
+    <div class="s"><h4 class="pf">Apple &amp; Cinnamon</h4><p>Apple, cinnamon, nutmeg, clove</p></div>
+    <div class="s"><h4 class="pf">Lavender &amp; Ylang Ylang</h4><p>Lavender, ylang ylang</p></div>
+    <div class="s"><h4 class="pf">Spruce &amp; Juniper</h4><p>Juniper berry, scotch pine, spruce, spearmint, cedarwood, patchouli</p></div>
+    <div class="s"><h4 class="pf">Orchid &amp; Sea</h4><p>Fresh orchid, white musk, greens, jasmine, sea salt, ozone, tonka bean</p></div>
   </div>
 </section>
 <p class="foot">Each set arrives in a paper bag with a gift tag.</p>
