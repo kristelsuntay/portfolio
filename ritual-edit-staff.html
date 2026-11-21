@@ -122,11 +122,18 @@ select{box-sizing:border-box;max-width:100%;min-height:40px}
 .ocard.dirty{border-color:var(--ink)}
 .olist{grid-template-columns:1fr!important;gap:8px!important}
 .ohead{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch}
-.omain{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"who amt" "meta amt" "st amt";gap:3px 28px;padding:15px 10px 15px 18px;width:100%;text-align:left;border:none;background:none;border-radius:0;align-items:start}
+.omain{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"who amt" "meta pay";gap:5px 20px;padding:15px 10px 15px 18px;width:100%;text-align:left;border:none;background:none;border-radius:0;align-items:start}
 .omain .who{grid-area:who}
 .omain .meta{grid-area:meta}
-.omain .amt{grid-area:amt;align-self:center;padding-right:6px}
-.omain .st{grid-area:st;margin-top:9px}
+.omain .amt{grid-area:amt;justify-self:end;align-self:start;padding-right:6px}
+.omain .pay{grid-area:pay;justify-self:end;padding-right:6px;font-size:12.5px}
+.omain .meta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.pl{display:inline-flex;gap:4px;align-items:center;font-weight:500;color:var(--muted)}
+.pl svg{width:12px;height:12px}
+.pl.paid{color:var(--ink)}
+.pl.unpaid,.pl.part{color:var(--ink);font-weight:600}
+.duetag{display:inline-block;padding:1px 8px;border:1px solid var(--line-strong);border-radius:99px;font-size:11.5px;color:var(--ink);font-weight:500}
+.duetag.urgent{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .omain:hover{background:var(--raise)}
 .chevbtn{border:none;border-left:1px solid var(--line);border-radius:0;background:none;padding:0 14px;color:var(--muted)}
 .chevbtn:hover{background:var(--raise);color:var(--ink)}
@@ -517,8 +524,7 @@ body.staff .navrow,body.staff #savebar,body.staff .src a,body.staff #viewOrders,
   .stepper button,.stepper input{min-height:44px}
   .modal input,.modal select{min-height:44px}
   .modal .body{padding:12px 18px}
-  .omain{grid-template-areas:"who amt" "meta amt" "st st";gap:3px 16px;padding:14px 8px 14px 14px}
-  .omain .amt{align-self:start;padding-top:2px}
+  .omain{gap:5px 14px;padding:14px 8px 14px 14px}
   .chevbtn{padding:0 10px}
   .modal-bg{align-items:flex-end;padding:0}
   .modal{width:100%;max-height:92vh;border-radius:18px 18px 0 0;border-bottom:none;animation:sheetIn .35s var(--ease)}
@@ -975,6 +981,13 @@ function statusPills(g){
   const serve = g.toServe ? `<span class="badge serve">${ICON.box}To serve</span>` : `<span class="badge served">${ICON.check}Served</span>`;
   return pay + serve;
 }
+/* List-level payment status: one short word, balance when partly paid. */
+function payLabel(g){
+  if(g.status==="deleted") return `<span class="badge gone">Deleting</span>`;
+  if(g.status==="paid") return `<span class="pl paid">${ICON.check}Paid</span>`;
+  if(g.status==="part") return `<span class="pl part">${money(g.due)} due</span>`;
+  return `<span class="pl unpaid">Unpaid</span>`;
+}
 const CHEV = `<svg class="chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>`;
 function renderLog(){
   renderKpis(); renderAttn();
@@ -998,8 +1011,8 @@ function renderLog(){
         <button type="button" class="omain" data-order="${esc(g.key)}" aria-label="Edit order ${esc(g.no||"")} for ${esc(g.cust)}">
           <span class="who">${esc(g.cust||"No name")}</span>
           <span class="amt">${money(g.total)}</span>
-          <span class="meta">${g.no?`<b>${esc(g.no)}</b> · `:""}${g.first?shortDate(g.first):"No date"}${g.last && g.first && g.last.getTime()!==g.first.getTime()?"–"+shortDate(g.last):""} · ${n} item${n===1?"":"s"}${g.toServe && g.dueBy ? ` · <b>${esc(dueLabel(g.dueBy).text)}</b>` : ""}</span>
-          <span class="st">${statusPills(g)}</span>
+          <span class="meta">${n} item${n===1?"":"s"}${g.toServe && g.dueBy ? (() => { const d = dueLabel(g.dueBy); return ` <span class="duetag ${d.urgent?"urgent":""}">${esc(d.text)}</span>`; })() : ""}</span>
+          <span class="pay">${payLabel(g)}</span>
         </button>
         <button type="button" class="chevbtn" data-toggle="${esc(g.key)}" aria-expanded="${isOpen}" aria-label="${isOpen?"Hide":"Show"} items">${CHEV}</button>
       </div>
