@@ -2214,7 +2214,7 @@ const Pack = (() => {
         return `<article class="pk-ticket ${ready?"ready":""}" style="--i:${Math.min(i,12)}">${head(g)}
           <ul class="pk-items">${g.goods.map(x => { const it = parseItem(x.cur.item), sp = splitItem(x.cur.item), k = tickKey(g,x), on = !!ticks[k], tbd = /^tbd$/i.test(sp.scent); return `
             <li><label class="pk-tick ${on?"done":""}"><input type="checkbox" data-tick="${esc(k)}" ${on?"checked":""}>
-              <span><span class="q">${num(x.cur.qty)}×</span><span class="t">${esc(tbd ? titleCase(sp.cat) : it.title)}</span>${tbd?`<span class="pk-tbd">Scent not chosen</span>`:""}${it.sub||x.cur.made?`<span class="d">${esc(it.sub||"")}${x.cur.made?`${it.sub?" · ":""}made`:""}</span>`:""}</span></label></li>`; }).join("")}</ul>
+              <span><span class="q">${num(x.cur.qty)}×</span><span class="t">${esc(tbd ? titleCase(sp.cat) : it.title)}</span>${tbd?`<span class="pk-tbd">Scent not chosen</span>`:""}${it.sub||x.cur.made?`<span class="d">${esc(it.sub||"")}${x.cur.made?`${it.sub?" · ":""}${isMade(x)?"made":"part made"}`:""}</span>`:""}</span></label></li>`; }).join("")}</ul>
           ${ship?`<div class="pk-ship">Delivery order · shipping fee included</div>`:""}
           <div class="pk-foot"><span class="pk-prog"><span class="pk-bar"><i style="width:${keys.length?got/keys.length*100:0}%"></i></span>${got} of ${keys.length} packed</span>
             <span class="pk-acts">${g.unpaidRows.length?`<button type="button" data-pay="${esc(g.key)}">Payment received</button>`:""}
@@ -2248,8 +2248,9 @@ const Pack = (() => {
     const b = e.target.closest("button"); if(!b) return;
     if(b.dataset.made || b.dataset.madeall || b.dataset.unmade){
       const mk = makeList();
-      if(b.dataset.made){ const l = mk.flatMap(s => s.lines).find(l => l.key === b.dataset.made); if(l) confirmMade(l.rows, `Mark ${fmtNum(l.qty)}× ${l.prod} made?`); }
-      else if(b.dataset.madeall){ const s = mk.find(s => s.scent === b.dataset.madeall); if(s) confirmMade(s.lines.flatMap(l => l.rows), `Mark all ${s.scent} made?`); }
+      const entriesOf = l => l.rows.map(x => ({ x, prod: l.set ? l.prod : null }));
+      if(b.dataset.made){ const l = mk.flatMap(s => s.lines).find(l => l.key === b.dataset.made); if(l) confirmMade(entriesOf(l), `Mark ${fmtNum(l.qty)}× ${l.prod} made?`); }
+      else if(b.dataset.madeall){ const s = mk.find(s => s.scent === b.dataset.madeall); if(s) confirmMade(s.lines.flatMap(entriesOf), `Mark all ${s.scent} made?`); }
       else { const s = mk.find(s => s.scent === b.dataset.unmade); if(s) confirmUnmade(s.made, s.scent); }
       return;
     }
@@ -2260,7 +2261,19 @@ const Pack = (() => {
 
 
   /* ---------- To make: unserved items grouped by scent ---------- */
-  const isMade = x => !!String(x.cur.made||"").trim();
+  /* Made column: a date = the whole row is made. A set can also be made part by part,
+     stored as "Candle 95g 11/22/2026; Room Spray 100ml 11/23/2026". */
+  const partName = (pt, x) => pt.cat ? [pt.cat, pt.size].filter(Boolean).join(" ") : x.cur.item;
+  const isSetRow = x => /^(gift )?set$/i.test(splitItem(x.cur.item).cat);
+  const partsOf = x => setParts(splitItem(x.cur.item).size).map(pt => partName(pt, x));
+  function madeParts(x){
+    const v = String(x.cur.made||"").trim(); if(!v) return {};
+    if(parseSheetDate(v)) return null;
+    const o = {}; v.split(/\s*;\s*/).forEach(t => { const m = t.match(/^(.*\S)\s+(\d{1,2}\/\d{1,2}\/\d{2,4})$/); if(m) o[m[1]] = m[2]; });
+    return o;
+  }
+  const isMade = x => madeParts(x) === null;
+  const partsText = o => Object.entries(o).map(([p,d]) => `${p} ${d}`).join("; ");
   const timeOr = d => d ? d.getTime() : Infinity;
   function makeList(){
     const map = new Map();
@@ -2269,12 +2282,14 @@ const Pack = (() => {
       const scent = !sp.cat ? "Other items" : /^tbd$/i.test(sp.scent) ? "Scent not chosen" : sp.scent;
       if(!map.has(scent)) map.set(scent, { scent, lines:new Map(), made:[] });
       const s = map.get(scent);
-      if(isMade(x)){ s.made.push(x); return; }
+      const mp = madeParts(x);
+      if(mp === null){ s.made.push({ x }); return; }
       /* A set is made as its separate products; each part keeps a Set tag and stays apart from single orders. */
       const isSet = /^(gift )?set$/i.test(sp.cat);
       const parts = isSet ? setParts(sp.size) : [{ cat: sp.cat, size: sp.size }];
       parts.forEach(pt => {
-        const prod = pt.cat ? [pt.cat, pt.size].filter(Boolean).join(" ") : x.cur.item;
+        const prod = partName(pt, x);
+        if(isSet && mp[prod]){ s.made.push({ x, prod }); return; }
         const key = scent + "|" + prod + (isSet ? "|set" : "");
         if(!s.lines.has(key)) s.lines.set(key, { key, prod, cat: pt.cat, size: pt.size, set: isSet, qty: 0, rows: [] });
         const l = s.lines.get(key); l.qty += num(x.cur.qty) * (pt.n || 1); l.rows.push(x);
@@ -2371,7 +2386,7 @@ const Pack = (() => {
       const made = g.scent && !mk.prod ? madeOf(g.scent) : [];
       return `<article class="pk-ticket mk" style="--i:${Math.min(i,12)}">${head(g.title, g.lines, g.scent && g.lines.length > 1 ? `<button type="button" data-madeall="${esc(g.scent)}">All made</button>` : "")}
         <ul class="pk-items">${g.lines.map(g.line).join("")}</ul>
-        ${made.length ? `<div class="mk-done"><span>Made, waiting to hand over: ${made.map(x => `${fmtNum(num(x.cur.qty))}× ${esc([splitItem(x.cur.item).cat, splitItem(x.cur.item).size].filter(Boolean).join(" ") || x.cur.item)} (${esc(firstName(x.cur.cust))})`).join(", ")}</span>
+        ${made.length ? `<div class="mk-done"><span>Made, waiting to hand over: ${made.map(({x, prod}) => `${fmtNum(num(x.cur.qty))}× ${esc(prod || [splitItem(x.cur.item).cat, splitItem(x.cur.item).size].filter(Boolean).join(" ") || x.cur.item)}${prod ? " (set)" : ""} (${esc(firstName(x.cur.cust))})`).join(", ")}</span>
           <button type="button" class="link" data-unmade="${esc(g.scent)}">Undo</button></div>` : ""}
       </article>`;
     }).join("");
@@ -2394,14 +2409,30 @@ const Pack = (() => {
       ok: "Done", onOk: () => closeModal(),
       alt: ticked.length ? { label: "Clear ticks", onClick: () => { mk.sel.clear(); saveMk(); closeModal(); render(); } } : null });
   }
-  function confirmMade(rows, title){
+  /* entries: [{ x, prod }] where prod is a set part ("Candle 95g") or null for the whole row. */
+  const groupEntries = entries => { const m = new Map(); entries.forEach(({x, prod}) => { if(!m.has(x.id)) m.set(x.id, { x, prods: new Set(), whole: false }); const g = m.get(x.id); if(prod) g.prods.add(prod); else g.whole = true; }); return [...m.values()]; };
+  const entryList = entries => `<ul class="pk-lines">${entries.map(({x, prod}) => { const it = parseItem(x.cur.item); return prod
+    ? `<li><b>${num(x.cur.qty)}× ${esc(prod)}</b> · from ${esc(it.title)} (${esc(firstName(x.cur.cust))})</li>`
+    : `<li><b>${num(x.cur.qty)}× ${esc(it.title)}</b>${it.sub?" · "+esc(it.sub):""}</li>`; }).join("")}</ul>`;
+  function confirmMade(entries, title){
     const today = todaySheet();
-    openModal({ title, sub:`Made date ${today}. They stay on To pack until handed over.`, body: lineList(rows), ok:"Mark made",
-      onOk: () => save(rows.map(x => ({ x, set:{ made:today } })), "Marked made") });
+    const changes = groupEntries(entries).map(({x, prods, whole}) => {
+      if(whole || !isSetRow(x)) return { x, set:{ made:today } };
+      const mp = madeParts(x) || {}; prods.forEach(p => mp[p] = today);
+      return { x, set:{ made: partsOf(x).every(p => mp[p]) ? today : partsText(mp) } };
+    });
+    openModal({ title, sub:`Made date ${today}. They stay on To pack until handed over.`, body: entryList(entries), ok:"Mark made",
+      onOk: () => save(changes, "Marked made") });
   }
-  function confirmUnmade(rows, scent){
-    openModal({ title:`Undo made for ${scent}?`, sub:"These go back on the To make list.", body: lineList(rows), ok:"Undo made",
-      onOk: () => save(rows.map(x => ({ x, set:{ made:"" } })), `${scent} back on To make`) });
+  function confirmUnmade(entries, scent){
+    const changes = groupEntries(entries).map(({x, prods, whole}) => {
+      if(whole) return { x, set:{ made:"" } };
+      const mp = madeParts(x); const o = mp === null ? Object.fromEntries(partsOf(x).map(p => [p, String(x.cur.made).trim()])) : mp;
+      prods.forEach(p => delete o[p]);
+      return { x, set:{ made: partsText(o) } };
+    });
+    openModal({ title:`Undo made for ${scent}?`, sub:"These go back on the To make list.", body: entryList(entries), ok:"Undo made",
+      onOk: () => save(changes, `${scent} back on To make`) });
   }
   const lineList = xs => `<ul class="pk-lines">${xs.map(x => { const it = parseItem(x.cur.item); return `<li><b>${num(x.cur.qty)}× ${esc(it.title)}</b>${it.sub?" · "+esc(it.sub):""}</li>`; }).join("")}</ul>`;
   function confirmServe(g){
