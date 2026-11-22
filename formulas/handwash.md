@@ -58,18 +58,18 @@ Prices are the final amount paid after vouchers.
 | Per bottle | Cost |
 |---|---|
 | Handwash liquid (300g) | ₱33.35 |
-| Plastic pump bottle 300ml (21 Nov: 150 for ₱3,600) | ₱24.00 |
+| Plastic pump bottle 300ml (21 Nov: 150 for ₱3,600 + ₱171 shipping) | ₱25.14 |
 | Label (vinyl sticker, laminate, ink) | ₱1.71 |
-| **Total per bottle** | **≈ ₱59** |
+| **Total per bottle** | **≈ ₱60** |
 
 ## Against your prices
 
 | Price | Profit per bottle | Price ÷ cost |
 |---|---|---|
-| ₱180 (1 to 10) | ₱121 | 3.0× |
-| ₱170 (11 to 49) | ₱111 | 2.9× |
-| ₱160 (50 to 99) | ₱101 | 2.7× |
-| ₱155 (100+) | ₱96 | 2.6× |
+| ₱180 (1 to 10) | ₱120 | 3.0× |
+| ₱170 (11 to 49) | ₱110 | 2.8× |
+| ₱160 (50 to 99) | ₱100 | 2.7× |
+| ₱155 (100+) | ₱95 | 2.6× |
 
 Fragrance oil is 45% of the liquid cost. Each extra 0.5% of fragrance adds ₱7.50 per bottle.
 
