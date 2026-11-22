@@ -32,7 +32,7 @@ Prices are the final amount paid after vouchers.
 | SLES Gel 70% | 4 × 1 kg (21 Nov, AK Tinson) | ₱598 | ₱0.150 |
 | Coco Betaine (CAPB) | 3 × 1 kg (21 Nov, AK Tinson) | ₱374 | ₱0.125 |
 | Vegetable Glycerine USP | 1 kg (21 Nov, AK Tinson) | ₱174 | ₱0.174 |
-| Polysorbate 20 | 100 g (21 Nov, Asteria Apothecary) | ₱217 | ₱2.17 |
+| Polysorbate 20 | 250 g (Asteria Apothecary, after voucher) | ₱300 | ₱1.20 |
 | Phenoxyethanol | 250 g (21 Nov, Homanka) | ₱218 | ₱0.872 |
 | Fragrance oil | Fixed planning rate (recent 100 g bottles cost ₱459–461) | – | ₱5.00 |
 | Distilled water | 10 L | ₱100 | ₱0.010 |
@@ -49,27 +49,27 @@ Prices are the final amount paid after vouchers.
 | SLES | ₱17.94 | ₱5.38 |
 | CAPB | ₱12.47 | ₱3.74 |
 | Fragrance oil | ₱50.00 | ₱15.00 |
-| Polysorbate 20 | ₱6.51 | ₱1.95 |
+| Polysorbate 20 | ₱3.60 | ₱1.08 |
 | Phenoxyethanol | ₱8.72 | ₱2.62 |
 | Citric acid | ₱0.26 | ₱0.08 |
 | Salt | ₱1.73 | ₱0.52 |
-| **Liquid total** | **₱111.12** | **₱33.35** |
+| **Liquid total** | **₱108.21** | **₱32.48** |
 
 | Per bottle | Cost |
 |---|---|
-| Handwash liquid (300g) | ₱33.35 |
+| Handwash liquid (300g) | ₱32.48 |
 | Plastic pump bottle 300ml (21 Nov: 150 for ₱3,600 + ₱171 shipping) | ₱25.14 |
 | Label (vinyl sticker, laminate, ink) | ₱1.71 |
-| **Total per bottle** | **≈ ₱60** |
+| **Total per bottle** | **≈ ₱59** |
 
 ## Against your prices
 
 | Price | Profit per bottle | Price ÷ cost |
 |---|---|---|
-| ₱180 (1 to 10) | ₱120 | 3.0× |
-| ₱170 (11 to 49) | ₱110 | 2.8× |
-| ₱160 (50 to 99) | ₱100 | 2.7× |
-| ₱155 (100+) | ₱95 | 2.6× |
+| ₱180 (1 to 10) | ₱121 | 3.0× |
+| ₱170 (11 to 49) | ₱111 | 2.9× |
+| ₱160 (50 to 99) | ₱101 | 2.7× |
+| ₱155 (100+) | ₱96 | 2.6× |
 
 Fragrance oil is 45% of the liquid cost. Each extra 0.5% of fragrance adds ₱7.50 per bottle.
 
