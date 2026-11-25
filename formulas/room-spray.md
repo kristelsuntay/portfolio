@@ -24,6 +24,10 @@ With about 28% alcohol in the finished spray, it needs no added preservative.
 | DPG (dipropylene glycol, fragrance grade) | 2 | 2 g | 20 g | Fixative, scent lasts longer |
 | **Total** | **100** | **100 g** | **1,000 g** | |
 
+## Fill weight
+
+The spray is lighter than water (about 0.96 g/ml, because of the ethanol), so **100 ml weighs about 96 g**. Fill each bottle with **96 g**, not 100 g: 100 g is about 104 ml and overfills the bottle. When making a batch, plan 96 g per bottle.
+
 ## Method
 
 1. Stir fragrance oil + polysorbate 20 + DPG until smooth.
