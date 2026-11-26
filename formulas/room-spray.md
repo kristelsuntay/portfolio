@@ -1,67 +1,83 @@
-# Room & Linen Spray: Hybrid Formula
+# Room & Linen Spray: Base + Oil
 
-The Ritual Edit · 100ml room & linen spray · chosen 21 November 2026
+The Ritual Edit · 100ml room & linen spray · updated 26 November 2026
 
-## Why this formula
+## How it works
 
-Fragrance oil does not dissolve in water. This formula uses two helpers:
+You make one **unscented base** (with polysorbate 20 already in it), then add fragrance oil per scent.
 
 - **Ethanol** dissolves the oil and carries the scent into the air.
-- **Polysorbate 20** holds the oil in the water.
+- **Polysorbate 20** holds the oil in the water. It is in the base so the oil mixes straight in, like a bought base.
+- **DPG** slows evaporation so the scent lasts longer.
 
-**DPG** slows evaporation so the scent lasts longer.
+With about 30% alcohol in the finished spray, it needs no added preservative.
 
-With about 28% alcohol in the finished spray, it needs no added preservative.
+**Pitcher limit: 800 g per batch.**
 
-## Formula
+## 1. Room spray base (one 800 g batch)
 
-| Ingredient | % | Per 100g bottle | Per 1 kg batch | Job |
-|---|---|---|---|---|
-| Distilled water | 58 | 58 g | 580 g | Base |
-| Ethanol 95% (perfumer's / cosmetic grade) | 30 | 30 g | 300 g | Solvent, scent lift, preservation |
-| Fragrance oil | 5 | 5 g | 50 g | Scent |
-| Polysorbate 20 | 5 | 5 g | 50 g | Solubilizer (start 1:1 with oil) |
-| DPG (dipropylene glycol, fragrance grade) | 2 | 2 g | 20 g | Fixative, scent lasts longer |
-| **Total** | **100** | **100 g** | **1,000 g** | |
+| Ingredient | % of base | Per 800 g batch |
+|---|---|---|
+| Distilled water | 55.8 | 446.5 g |
+| Ethanol 95% (cosmetic grade) | 31.6 | 252.6 g |
+| Polysorbate 20 | 10.5 | 84.2 g |
+| DPG | 2.1 | 16.7 g |
+| **Total** | **100** | **800 g** |
+
+Mix: polysorbate 20 + DPG + ethanol first, stir until clear. Add the water slowly while stirring. Cover tightly. Flammable.
+
+One 800 g batch of base = about **8.8 bottles**.
+
+## 2. Add the scent
+
+| Per | Base | Fragrance oil | Total |
+|---|---|---|---|
+| 1 bottle (100 ml) | 91.2 g | 4.8 g | 96 g |
+| 3 bottles | 273.6 g | 14.4 g | 288 g |
+| 6 bottles | 547.2 g | 28.8 g | 576 g |
+| 8 bottles (max per pitcher) | 729.6 g | 38.4 g | 768 g |
+| Rule | any amount | **base ÷ 19** | |
+
+Add the oil slowly into the base while stirring. Stir 2 minutes. If it is still cloudy after 10 minutes, stir in polysorbate 20, 2 g at a time, until clear, and note the amount for that scent.
+
+Rest 24 hours before bottling.
 
 ## Fill weight
 
-The spray is lighter than water (about 0.96 g/ml, because of the ethanol), so **100 ml weighs about 96 g**. Fill each bottle with **96 g**, not 100 g: 100 g is about 104 ml and overfills the bottle. When making a batch, plan 96 g per bottle.
+The spray is lighter than water (about 0.96 g/ml), so **100 ml weighs about 96 g**. Fill each bottle with **96 g**.
 
-## Method
+## Finished spray (per 96 g bottle)
 
-1. Stir fragrance oil + polysorbate 20 + DPG until smooth.
-2. Add the ethanol and stir.
-3. Add the water slowly while stirring.
-4. If it is hazy, add polysorbate 20 in 0.5 g steps per 100 g until clear. Note the final amount for that scent.
-5. Rest 24–48 hours before bottling.
+| Ingredient | Per bottle |
+|---|---|
+| Distilled water | 50.9 g |
+| Ethanol 95% | 28.8 g |
+| Polysorbate 20 | 9.6 g (2× the oil) |
+| Fragrance oil | 4.8 g |
+| DPG | 1.9 g |
 
-## Cost per 100ml
+## Cost per 100ml bottle
 
-| Ingredient | Cost per g | Per bottle |
-|---|---|---|
-| Distilled water | ₱0.01 | ₱0.60 |
-| Ethanol 95% | ₱0.235 (Homanka Raw Materials, ₱235/kg) | ₱7.05 |
-| Fragrance oil | ₱5.00 | ₱25.00 |
-| Polysorbate 20 | ₱1.20 (Asteria Apothecary, 250 g for ₱300) | ₱6.00 |
-| DPG | ₱0.50 (Homanka Raw Materials, ₱510/L, about 1.02 g/ml) | ₱1.00 |
-| **Liquid total** | | **≈ ₱39.65** |
-
-Previous method (bought base + 10% oil): ≈ ₱78–85 per 100ml. Saving ≈ ₱38–45 per bottle.
+| Ingredient | Per bottle |
+|---|---|
+| Fragrance oil (₱5/g) | ₱24.00 |
+| Polysorbate 20 (₱1.20/g) | ₱11.50 |
+| Ethanol 95% (₱0.235/g) | ₱6.80 |
+| DPG (₱0.30/g, AK Tinson 1 kg ₱299) | ₱0.60 |
+| Distilled water | ₱0.50 |
+| **Liquid** | **≈ ₱43** |
+| Spray bottle | ₱20–25 |
+| Label | ₱2 |
+| **Total** | **≈ ₱65–70** |
 
 ## Safety
 
-- **Flammable.** About 28% alcohol. Label "Flammable. Keep away from flames and heat." Do not spray near lit candles.
-- **IFRA.** Check each fragrance oil's IFRA certificate. Room sprays are Category 10B. Sprays used on fabric may fall under a stricter category (often 11A/11B). For "room & linen", use the lower limit.
+- **Flammable.** Label "Flammable. Keep away from flames and heat." Do not spray near lit candles.
+- **IFRA.** Check each fragrance oil's IFRA certificate. Room sprays are Category 10B; sprays used on fabric may fall under a stricter category (often 11A/11B). Use the lower limit for "room & linen".
 - Do not spray on skin or near the face.
 
 ## Test before selling
 
-1. Make 100 g of each new scent.
-2. Check clarity after 48 hours at room temperature and after one night in the fridge (cold can turn it cloudy).
-3. Spray white cotton, let it dry, and check for marks or stickiness.
-4. Watch the bottle for 4 weeks. Cloudiness, a change in smell or floating bits mean something is wrong.
-
-## To confirm
-
-- Polysorbate 20 amount per scent (some oils need more than 1:1).
+1. Check clarity after 48 hours at room temperature and after one night in the fridge.
+2. Spray white cotton, let it dry, and check for marks or stickiness.
+3. Watch the bottle for 4 weeks. Cloudiness, a change in smell or floating bits mean something is wrong.
