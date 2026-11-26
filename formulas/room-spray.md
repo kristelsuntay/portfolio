@@ -82,7 +82,18 @@ Two batches of the old 30% ethanol base with polysorbate 20 added (26 Nov 2026).
 | Used in tests | −90 g | |
 | **Left** | **≈ 886 g** (base + polysorbate) | |
 
-To use it later: mix 1 part of it with about 1 part ethanol 95%, then add oil, so the alcohol is high enough to stay clear.
+### How to use it (rescue)
+
+Rule: **1 part old base + 1 part ethanol 95% + oil = (old base + ethanol) ÷ 24.** That brings the alcohol to about 62%, with the polysorbate already in it helping.
+
+| Pitcher (max 800 g) | Old base | Ethanol 95% | Fragrance oil | Makes |
+|---|---|---|---|---|
+| 1 | 380 g | 380 g | 32 g | 792 g · 8 bottles |
+| 2 | 380 g | 380 g | 32 g | 792 g · 8 bottles |
+| 3 | 126 g | 126 g | 10.5 g | 262 g · 2–3 bottles |
+| **Total** | **886 g** | **886 g** | **74.5 g** | **≈ 19 bottles** |
+
+Test first: 50 g old base + 50 g ethanol + 4 g oil. Check it after 1 hour and the next day before doing a full pitcher.
 
 ## High-ethanol room & linen spray (clear, 100 g)
 
