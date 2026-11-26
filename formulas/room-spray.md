@@ -44,7 +44,7 @@ Rest 24 hours before bottling.
 
 ## Fill weight
 
-The spray is lighter than water (about 0.96 g/ml), so **100 ml weighs about 96 g**. Fill each bottle with **96 g**.
+Fill each bottle with **90 g** (measured on the actual bottles).
 
 ## Finished spray (per 96 g bottle)
 
@@ -105,7 +105,7 @@ Test first: 50 g old base + 50 g ethanol + 4 g oil. Check it after 1 hour and th
 | DPG | 1 g |
 | **Total** | **100 g** |
 
-Mix oil + DPG into the ethanol first, then add the water slowly. No polysorbate needed. Fill 96 g per 100 ml bottle.
+Mix oil + DPG into the ethanol first, then add the water slowly. No polysorbate needed. Fill **90 g** per bottle (86.4 g base + 3.6 g oil).
 
 Oil and DPG are kept lower than a room-only spray so it does not leave oily marks on fabric. Spray white cotton from 30 cm, let it dry, and check before selling.
 
