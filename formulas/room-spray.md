@@ -84,17 +84,19 @@ Two batches of the old 30% ethanol base with polysorbate 20 added (26 Nov 2026).
 
 To use it later: mix 1 part of it with about 1 part ethanol 95%, then add oil, so the alcohol is high enough to stay clear.
 
-## High-ethanol room spray (clear, 100 g)
+## High-ethanol room & linen spray (clear, 100 g)
 
 | Ingredient | Amount |
 |---|---|
 | Ethanol 95% | 70 g |
-| Distilled water | 23 g |
-| Fragrance oil | 5 g |
-| DPG | 2 g |
+| Distilled water | 25 g |
+| Fragrance oil | 4 g |
+| DPG | 1 g |
 | **Total** | **100 g** |
 
 Mix oil + DPG into the ethanol first, then add the water slowly. No polysorbate needed. Fill 96 g per 100 ml bottle.
+
+Oil and DPG are kept lower than a room-only spray so it does not leave oily marks on fabric. Spray white cotton from 30 cm, let it dry, and check before selling.
 
 ## Safety
 
