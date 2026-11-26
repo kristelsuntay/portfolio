@@ -70,6 +70,32 @@ The spray is lighter than water (about 0.96 g/ml), so **100 ml weighs about 96 g
 | Label | ₱2 |
 | **Total** | **≈ ₱65–70** |
 
+## On hand (not in use)
+
+Two batches of the old 30% ethanol base with polysorbate 20 added (26 Nov 2026). They turn cloudy with fragrance oil, so they are set aside for now.
+
+| Batch | Base | Polysorbate 20 added |
+|---|---|---|
+| 1 | 750 g | 88.2 g |
+| 2 | 123.6 g | 14.5 g |
+| Total made | 873.6 g | 102.8 g |
+| Used in tests | −90 g | |
+| **Left** | **≈ 886 g** (base + polysorbate) | |
+
+To use it later: mix 1 part of it with about 1 part ethanol 95%, then add oil, so the alcohol is high enough to stay clear.
+
+## High-ethanol room spray (clear, 100 g)
+
+| Ingredient | Amount |
+|---|---|
+| Ethanol 95% | 70 g |
+| Distilled water | 23 g |
+| Fragrance oil | 5 g |
+| DPG | 2 g |
+| **Total** | **100 g** |
+
+Mix oil + DPG into the ethanol first, then add the water slowly. No polysorbate needed. Fill 96 g per 100 ml bottle.
+
 ## Safety
 
 - **Flammable.** Label "Flammable. Keep away from flames and heat." Do not spray near lit candles.
