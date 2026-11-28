@@ -44,7 +44,7 @@ Rest 24 hours before bottling.
 
 ## Fill weight
 
-Fill each bottle with **90 g** (measured on the actual bottles).
+Fill each bottle with **95 g** total (91 g base + 4 g oil). Updated 28 Nov 2026.
 
 ## Finished spray (per 96 g bottle)
 
@@ -93,7 +93,7 @@ Two batches of the old 30% ethanol base with polysorbate 20 added (26 Nov 2026).
 | DPG | small amount, as added |
 | **Total** | **about 762 g** |
 
-This is the 1:1 rescue mix. Scent at 3.6 g oil per 86.4 g base (oil = total ÷ 24): about 8 bottles, ~70 g base left over.
+This is the 1:1 rescue mix. Scent at 4 g oil per 91 g base (oil = total ÷ 24): 8 bottles at 95 g, about 34 g base left over.
 
 Full conversion would need 119 g more ethanol (381 × 1.3125 = 500 g). Add it only if the scented test clouds.
 
@@ -109,7 +109,7 @@ Old base left: about 505 g.
 | DPG | 1 g |
 | **Total** | **100 g** |
 
-Mix oil + DPG into the ethanol first, then add the water slowly. No polysorbate needed. Fill **90 g** per bottle (86.4 g base + 3.6 g oil).
+Mix oil + DPG into the ethanol first, then add the water slowly. No polysorbate needed. Fill **95 g** per bottle (91 g base + 4 g oil).
 
 Oil and DPG are kept lower than a room-only spray so it does not leave oily marks on fabric. Spray white cotton from 30 cm, let it dry, and check before selling.
 
