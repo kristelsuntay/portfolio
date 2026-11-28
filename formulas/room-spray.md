@@ -81,23 +81,23 @@ Two batches of the old 30% ethanol base with polysorbate 20 added (26 Nov 2026).
 | Total made | 873.6 g | 102.8 g |
 | Used in tests | −90 g | |
 | **Left** | **≈ 886 g** (base + polysorbate) | |
-| Converted 28 Nov | −401 g | |
-| **Left now** | **≈ 485 g** | |
+| Converted 28 Nov | −381 g | |
+| **Left now** | **≈ 505 g** | |
 
-### Conversion batch, 28 Nov 2026 (best reconstruction)
+### Conversion batch, 28 Nov 2026
 
 | In the pitcher | Amount |
 |---|---|
-| Old base | 401 g |
-| Ethanol 95% | 381 g |
-| DPG | about 2 g |
-| **Total** | **about 784 g** |
+| Old base | 381 g |
+| Ethanol 95% | 381 g (pitcher full) |
+| DPG | small amount, as added |
+| **Total** | **about 762 g** |
 
-Ethanol left: about 2 g. This is close to the 1:1 rescue mix (oil = total ÷ 24), not the full conversion (which needs 145 g more ethanol).
+This is the 1:1 rescue mix. Scent at 3.6 g oil per 86.4 g base (oil = total ÷ 24): about 8 bottles, ~70 g base left over.
 
-Test 50 g with 2.1 g oil before scenting the whole pitcher. If it clouds, add the 145 g ethanol once bought.
+Full conversion would need 119 g more ethanol (381 × 1.3125 = 500 g). Add it only if the scented test clouds.
 
-Old base left: about 485 g.
+Old base left: about 505 g.
 
 ## High-ethanol room & linen spray (clear, 100 g)
 
