@@ -81,6 +81,20 @@ Two batches of the old 30% ethanol base with polysorbate 20 added (26 Nov 2026).
 | Total made | 873.6 g | 102.8 g |
 | Used in tests | −90 g | |
 | **Left** | **≈ 886 g** (base + polysorbate) | |
+| Converted 28 Nov | −401 g | |
+| **Left now** | **≈ 485 g** | |
+
+### Conversion batch, 28 Nov 2026 (in progress)
+
+Target for 401 g old base: 526.3 g ethanol + 0.9 g DPG = 928.2 g (10 bottles).
+
+| Added so far | Amount |
+|---|---|
+| Old base | 401 g |
+| Ethanol 95% | 381 g (pitcher full) |
+| **Still to add** | **145.3 g ethanol + 0.9 g DPG** |
+
+To finish: split the 782 g into two containers (391 g each), then add 72.7 g ethanol + about 0.45 g DPG to each.
 
 ### How to use it (rescue)
 
