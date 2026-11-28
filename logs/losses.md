@@ -9,7 +9,8 @@ Costs use the per-gram rates in the Purchase Log and formula notes. Ink is an es
 | 26 Nov 2026 | Room spray base with polysorbate 20 went cloudy (873.6 g base + 102.8 g polysorbate) | Ethanol ~276 g (₱65), polysorbate 20 ~195 g (₱234), DPG ~18 g (₱5), water (₱1) | ₱305 |
 | 28 Nov 2026 | Label misprint, about 10 sheets | QUAFF matte vinyl 10 sheets (₱80), QUAFF matte laminate 10 sheets (₱40), ink (~₱50) | ₱170 |
 | 28 Nov 2026 | 1:1 rescue batch (381 g old base + 381 g ethanol) did not work | Ethanol 381 g (₱90), DPG ~2 g (₱1) | ₱91 |
-| | **Total** | | **≈ ₱566** |
+| 28 Nov 2026 | Rush same-day order from Asteria Apothecary to replace the failed room spray | Shipping | ₱170 |
+| | **Total** | | **≈ ₱736** |
 
 Not counted: fragrance oil used in the room spray tests, and electricity (under ₱1).
 
